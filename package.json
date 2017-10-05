@@ -13,6 +13,9 @@
     "start": "nodemon server/www.js --exec babel-node --presets es2015,stage-2"
   },
   "dependencies": {
+    "axios": "^0.16.2",
+    "cachios": "^1.0.6",
+    "dotenv": "^4.0.0",
     "koa": "^2.3.0",
     "koa-router": "^7.2.1",
     "koa-static": "^4.0.1"

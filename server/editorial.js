@@ -13,99 +13,113 @@ import autoTagger from 'auto-tagger'
 
 export default function bundleArticles(articles, options = {}) {
 	const opts = Object.assign({},{
-		TAGFREQ_FLOOR_CATEGORY: articles.length / 2.5,
-		TAGFREQ_FLOOR_ARTICLE: 3,
-	 	TAGLENGTH_MAX_CATEGORY: 1,
-	 	TAGLENGTH_MAX_ARTICLE: 1,
+		TAGFREQ_FLOOR_CATEGORY: 20,
+	 	TAGLENGTH_MAX_CATEGORY: 2,
+		//
+		TAGFREQ_FLOOR_ARTICLE: 2,
+	 	TAGLENGTH_MAX_ARTICLE: 2,
 	}, options)
 
-	// console.log(`API access number __${res.headers['x-ratelimit-count']}__ - ${res.request.fromCache ? 'CACHED' : 'new data'}`)
-	// console.log("Bundling",articles)
-	console.log(`No of Entries: ${articles.length}`)
-	// Dedupe
-	// articles = articles.filter((thing, index, self) => self.findIndex(t => t.title === thing.title) === index)
-	// // console.log("Bundling",articles)
-	// console.log(`Deduped Entries: ${articles.length}`)
+	console.log(`Bundling ${articles.length} articles`)
 
-	// Tag articles
-	// Ultimately I want a venn diagram of most-exclusive tags
+	/**
+	 * ARTICLE TAGGING
+	 * Generate structured thematic definition
+	 * IOT group articles later
+	*/
 	var tagger = autoTagger
-		.useStopWords('en')
-		.useStopWords(['the','and'
-			// Technical
-			,'http','https','www','com','co','org','php','spip'
-			// Services
-			,'feedburner', 'rss',
-			// Syntax
-			,'–',':','/',',','.','','–'
-			// Datetime
-			,'2017','2016','2015','2014',
-			,'January','February','March','April','May','June','July','August','September','October','November','December'
-			// Numbers
-			,'0','1','2','3','4','5','6','7','8','9','10'
-			// Things that should be auto-filtered
-			,'internationalviewpoint'
-		])
+	.useStopWords('en')
+	.useStopWords(['the','and'
+		// Technical
+		,'http','https','www','com','co','org','php','spip'
+		// Services
+		,'feedburner', 'rss',
+		// Syntax
+		,'–',':','/',',','.','','–','\'','"'
+		// Datetime
+		,'2017','2016','2015','2014',
+		,'January','February','March','April','May','June','July','August','September','October','November','December'
+		// Numbers
+		,'0','1','2','3','4','5','6','7','8','9','10'
+		// Things that should be auto-filtered
+		,'internationalviewpoint'
+	])
 
-	let categoryBlob = ''
+	// Catwide tag library
+	let catTags = new Set()
 
-	articles.map(article => {
+	articles = articles.map(article => {
 		// Text of article to search through
 		let textBlob =
 			article.title
-			+article.keywords
-			+(
-				// article.content ? article.content.content :
-				article.summary ? article.summary.content : ''
-			)
+			+(article.keywords ? ' '+article.keywords.join(' ') : '')
+			// +(
+			// 	article.content ? article.content.content :
+			// 	article.summary ? article.summary.content : ''
+			// )
 		textBlob = textBlob.replace(new RegExp(article.origin.title,'i'), '')
 		textBlob = htmlToText.fromString(textBlob);
 
-		// Merge into the category-wide text
-		categoryBlob += textBlob
-
 		// Tag each article
 		article.tagData = tagger
-		.fromText(textBlob,
-		opts.TAGFREQ_FLOOR_ARTICLE,
-		opts.TAGLENGTH_MAX_ARTICLE)
+			.fromText(textBlob,
+			opts.TAGFREQ_FLOOR_ARTICLE,
+			opts.TAGLENGTH_MAX_ARTICLE)
 
 		// Flatten the tags, removing the number frequency
 		article.tags = article.tagData.map(tag => tag.word)
 		article.tags.concat(article.keywords)
 
+		// Add to the category-wide tag library
+		article.tags.forEach(tag => catTags.add(tag))
+
+		console.log(article.title, article.tagData)
+
 		return article
 	})
 
-	// Now tag the categories at large
-	// TODO: Focus on unusual words (e.g. by low->high corpus frequency)
-	// TODO: Group tags by overlap
-	// TODO: Identify similar tags (thesaurus, different forms of same word)
-	let categoryTags = tagger
-	.fromText(categoryBlob,
-		opts.TAGFREQ_FLOOR_CATEGORY,
-		opts.TAGLENGTH_MAX_CATEGORY)
+	console.log(catTags)
 
-	console.log(categoryTags)
+	/**
+	 * BUNDLING
+	 * 		TODO: Group tags by overlap
+	 * 		TODO: Identify similar tags (thesaurus, different forms of same word)
+	 * 		TODO: Focus on unusual words (e.g. by low->high corpus frequency)
+	 * Possible tools
+	 * 		leventshein
+	 *				https://stackoverflow.com/a/42287748/1053937
+	 * 		natural
+	 * 				https://dzone.com/articles/using-natural-nlp-module
+	 * 		naivebayesclassifier
+	 * 		node-svm
+	 * 				http://svmlight.joachims.org/
+	*/
 
-	// And then bundle articles according to the category-wide tags
-	let b = {}
-	categoryTags.map(t => t.word).forEach(tag => {
-		b[tag] = { combos: {}, articles: []}
+	let overlaps = {}
 
-		// Tag statistics
-		articles.forEach(a => {
-			if(a.tags.includes(tag)) {
-				// Identify overlapping tags
-				a.tags.forEach(aTag => {
-					if(aTag === tag) return;
-					b[tag].combos[aTag] = b[tag].combos[aTag] === undefined ? 0 : b[tag].combos[aTag]++
-				})
-
-				a.bundle = a.bundle == undefined ? [tag] : [...a.bundle, tag]
-			}
-		})
+	// Tag statistics
+	Array.from(catTags).forEach((t,i,arr) => {
+		let CAT_TAG_PERCENT = 0.5
+		if(i < arr.length*CAT_TAG_PERCENT) {
+			overlaps[t] = {}
+			articles.forEach(a => {
+				if(a.tags.includes(t)) {
+					// Document tag overlaps
+					a.tags.forEach(aTag => {
+						if(aTag === t) return;
+						overlaps[t][aTag] = overlaps[t][aTag] === undefined ? 1 : overlaps[t][aTag]++
+					})
+				}
+			})
+		}
 	})
+
+	// each tag
+		// each article
+			// each tags
+				// dict[tag][aTag]++
+
+	console.log(overlaps)
 
 	// Now order the tags by [1] global frequency, [2] overlaps
 	// => b[tag].articles.push(article.title)
@@ -122,15 +136,6 @@ export default function bundleArticles(articles, options = {}) {
 	// 	})
 	// })
 
-	console.log("Articles bundled.")
 	// console.log(articles.map(a=>({title: a.title, bundle: a.bundle})))
 	// console.log(b)
-
-	// leventshein
-	//		https://stackoverflow.com/a/42287748/1053937
-	// natural
-	// 		https://dzone.com/articles/using-natural-nlp-module
-	// naivebayesclassifier
-	// node-svm
-	// 		http://svmlight.joachims.org/
 }

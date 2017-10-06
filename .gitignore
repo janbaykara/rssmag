@@ -1,3 +1,5 @@
 node_modules
 .env
 feedly.json
+db.json
+yarn-error.log

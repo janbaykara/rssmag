@@ -2,15 +2,13 @@ import dotenv from 'dotenv'
 import Koa from 'koa'
 import koaStatic from 'koa-static'
 import KoaRouter from 'koa-router'
-import Editorial from './editorial'
+import bundleArticles from './editorial'
 import Feedly from './feedly'
 
 dotenv.config()
 
 const app = new Koa()
 const router =  new KoaRouter()
-
-const editorial = new Editorial()
 
 // 2. Fetch Feedly data
 // DOCS: https://developer.feedly.com/v3/sandbox/
@@ -26,7 +24,7 @@ Feedly.api
 
 	Feedly.getEntries(streamId, 100)
 	.then((articleData) => {
-		editorial.bundleArticles(articleData)
+		bundleArticles(articleData)
 	})
 	.catch(console.log)
 })

@@ -22,7 +22,7 @@ Feedly.api
 	// From above
 	const streamId = 'user/3a94abfc-0869-47f0-9e7c-892608dd551c/category/Political Comment';
 
-	Feedly.getEntries(streamId, 100)
+	Feedly.getEntries(streamId, 20)
 	.then((articleData) => {
 		bundleArticles(articleData)
 	})

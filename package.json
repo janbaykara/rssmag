@@ -13,10 +13,12 @@
     "start": "nodemon server/www.js --exec babel-node"
   },
   "dependencies": {
+    "auto-tagger": "^1.0.5",
     "axios": "^0.16.2",
     "axios-cache-adapter": "^1.5.0",
     "axios-cache-adapter-node": "^1.5.1",
     "dotenv": "^4.0.0",
+    "html-to-text": "^3.3.0",
     "koa": "^2.3.0",
     "koa-router": "^7.2.1",
     "koa-static": "^4.0.1",

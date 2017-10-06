@@ -154,9 +154,9 @@ aws4@^1.2.1:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.6.0.tgz#83ef5ca860b2b32e4a0deedee8c771b9db57471e"
 
-axios-cache-adapter-node@^1.5.1:
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/axios-cache-adapter-node/-/axios-cache-adapter-node-1.5.1.tgz#7988a76416d18f29f046f7227d3e0b68ddf296df"
+axios-cache-adapter-node@1.5.7:
+  version "1.5.7"
+  resolved "https://registry.yarnpkg.com/axios-cache-adapter-node/-/axios-cache-adapter-node-1.5.7.tgz#844096bc390dafc824576b53a8c1475f67167404"
   dependencies:
     axios "^0.16.2"
     lodash-es "^4.17.4"

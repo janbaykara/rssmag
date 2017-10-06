@@ -14,18 +14,18 @@ import autoTagger from 'auto-tagger'
 export default function bundleArticles(articles, options = {}) {
 	const opts = Object.assign({},{
 		TAGFREQ_FLOOR_CATEGORY: articles.length / 2.5,
-		TAGFREQ_FLOOR_ARTICLE: 5,
-	 	TAGLENGTH_MAX_ARTICLE: 2,
-	 	TAGLENGTH_MAX_CATEGORY: 2,
+		TAGFREQ_FLOOR_ARTICLE: 3,
+	 	TAGLENGTH_MAX_CATEGORY: 1,
+	 	TAGLENGTH_MAX_ARTICLE: 1,
 	}, options)
 
 	// console.log(`API access number __${res.headers['x-ratelimit-count']}__ - ${res.request.fromCache ? 'CACHED' : 'new data'}`)
 	// console.log("Bundling",articles)
 	console.log(`No of Entries: ${articles.length}`)
 	// Dedupe
-	articles = articles.filter((thing, index, self) => self.findIndex(t => t.title === thing.title) === index)
-	// console.log("Bundling",articles)
-	console.log(`Deduped Entries: ${articles.length}`)
+	// articles = articles.filter((thing, index, self) => self.findIndex(t => t.title === thing.title) === index)
+	// // console.log("Bundling",articles)
+	// console.log(`Deduped Entries: ${articles.length}`)
 
 	// Tag articles
 	// Ultimately I want a venn diagram of most-exclusive tags
@@ -50,6 +50,7 @@ export default function bundleArticles(articles, options = {}) {
 	let categoryBlob = ''
 
 	articles.map(article => {
+		// Text of article to search through
 		let textBlob =
 			article.title
 			+article.keywords
@@ -58,40 +59,56 @@ export default function bundleArticles(articles, options = {}) {
 				article.summary ? article.summary.content : ''
 			)
 		textBlob = textBlob.replace(new RegExp(article.origin.title,'i'), '')
-
 		textBlob = htmlToText.fromString(textBlob);
+
+		// Merge into the category-wide text
 		categoryBlob += textBlob
-		article.tagData = tagger.fromText(textBlob, opts.TAGFREQ_FLOOR_ARTICLE, opts.TAGLENGTH_MAX_ARTICLE)
+
+		// Tag each article
+		article.tagData = tagger
+		.fromText(textBlob,
+		opts.TAGFREQ_FLOOR_ARTICLE,
+		opts.TAGLENGTH_MAX_ARTICLE)
+
+		// Flatten the tags, removing the number frequency
 		article.tags = article.tagData.map(tag => tag.word)
 		article.tags.concat(article.keywords)
 
 		return article
 	})
 
-	let categoryTags = tagger.fromText(categoryBlob, opts.TAGFREQ_FLOOR_CATEGORY, opts.TAGLENGTH_MAX_CATEGORY)
-	// Focus on unusual words (e.g. by low->high corpus frequency)
-	// Group tags by overlap
+	// Now tag the categories at large
+	// TODO: Focus on unusual words (e.g. by low->high corpus frequency)
+	// TODO: Group tags by overlap
+	// TODO: Identify similar tags (thesaurus, different forms of same word)
+	let categoryTags = tagger
+	.fromText(categoryBlob,
+		opts.TAGFREQ_FLOOR_CATEGORY,
+		opts.TAGLENGTH_MAX_CATEGORY)
 
-	let bundle = {}
+	console.log(categoryTags)
 
-	categoryTags.map(t=>t.word).forEach(tag => {
-		bundle[tag] = { combos: {}, articles: []}
+	// And then bundle articles according to the category-wide tags
+	let b = {}
+	categoryTags.map(t => t.word).forEach(tag => {
+		b[tag] = { combos: {}, articles: []}
 
 		// Tag statistics
-		articles.forEach(article => {
-			if(article.tags.includes(tag)) {
+		articles.forEach(a => {
+			if(a.tags.includes(tag)) {
 				// Identify overlapping tags
-				article.tags.forEach(articleTag => {
-					if(articleTag === tag) return;
-					bundle[tag].combos[articleTag] = bundle[tag].combos[articleTag] === undefined ? 0 : bundle[tag].combos[articleTag]++
+				a.tags.forEach(aTag => {
+					if(aTag === tag) return;
+					b[tag].combos[aTag] = b[tag].combos[aTag] === undefined ? 0 : b[tag].combos[aTag]++
 				})
-				article.bundle = article.bundle == undefined ? [tag] : [...article.bundle, tag]
+
+				a.bundle = a.bundle == undefined ? [tag] : [...a.bundle, tag]
 			}
 		})
 	})
 
 	// Now order the tags by [1] global frequency, [2] overlaps
-	// => bundle[tag].articles.push(article.title)
+	// => b[tag].articles.push(article.title)
 
 	/*
 		[a,b,c]
@@ -105,7 +122,9 @@ export default function bundleArticles(articles, options = {}) {
 	// 	})
 	// })
 
-	// console.log(bundle)
+	console.log("Articles bundled.")
+	// console.log(articles.map(a=>({title: a.title, bundle: a.bundle})))
+	// console.log(b)
 
 	// leventshein
 	//		https://stackoverflow.com/a/42287748/1053937

@@ -22,9 +22,9 @@ router.get('/api/bundle/:streamId/:n', async (ctx, next) => {
 
 app.use(router.routes())
 // create-react-app in future
-app.use(koaStatic('./build'))
+app.use(koaStatic('./client/build'))
 
-const port = 3000
+const port = 3001
 
 app.listen(port, () => {
 	console.log(`Service started on port ${port}`)

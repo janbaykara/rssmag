@@ -27,23 +27,24 @@ const api = axios.create({
 function getEntries(streamId, requiredArticleN) {
 	return new Promise((resolve, reject) => {
 		let articleData = []
-		let continuation = null
+		let continuation = ''
 
 		fetch()
 
 		function fetch() {
 			return api
-			.get(`streams/${encodeURIComponent(streamId)}/contents${continuation ? `?continuation=${continuation}` : ''}`)
+			.get(`streams/${encodeURIComponent(streamId)}/contents${continuation}`)
 			.catch((e)=>reject(e))
 			.then(res => {
 				console.log(`🎃 API access number __${res.headers['x-ratelimit-count']}__ - ${res.request.fromCache ? 'CACHED' : 'new data'}`)
-				console.log("🤢 contents/?continuation="+res.data.continuation, res.data.items.length)
+				console.log("🤢 contents/?continuation="+continuation, res.data.items.length)
 				articleData = articleData.concat(res.data.items)
-				if(articleData.length >= requiredArticleN) {
+				if(articleData.length >= requiredArticleN || !res.data.continuation) {
 					console.log("😈 ARTICLEDATA acquired, no. of articles: ",articleData.length)
 					return resolve(articleData)
-				} else {
-					continuation = res.data.continuation
+				} else if(res.data.continuation) {
+					continuation = `?continuation=${res.data.continuation}`
+					console.log("Next continuation stream: ",res.data.continuation)
 					return fetch()
 				}
 			})

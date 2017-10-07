@@ -20,9 +20,10 @@ Feedly.api
 	console.log(`No of Categories: ${res.data.length}`)
 
 	// From above
-	const streamId = 'user/3a94abfc-0869-47f0-9e7c-892608dd551c/category/Political Comment';
+	// const streamId = 'user/3a94abfc-0869-47f0-9e7c-892608dd551c/category/Political Comment'; // Political Comment
+	const streamId = 'user/3a94abfc-0869-47f0-9e7c-892608dd551c/category/World News' // World News
 
-	Feedly.getEntries(streamId, 20)
+	Feedly.getEntries(streamId, 100)
 	.then((articleData) => {
 		bundleArticles(articleData)
 	})

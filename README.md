@@ -14,7 +14,7 @@ Hopefully we can solve [this](https://news.ycombinator.com/item?id=12933006).
 #### Notes
 ##### BUNDLING
 * [ ] Identify specific topics / entities of articles
-** [ ] Focus on unusual words (e.g. by low->high corpus frequency)
+** [X] Focus on unusual words (e.g. by low->high corpus frequency)
 ** [ ] Identify similar tags (thesaurus, different forms of same word)
 * [ ] Group tags by overlap, develop venn diagram of (near) exclusive article groups => bundle
 

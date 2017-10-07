@@ -17,7 +17,7 @@ export default function bundleArticles(articles, options = {}) {
 		TAG_FREQUENCY_ARTICLE: 2,
 		TAG_LENGTH_ARTICLE: 2,
 		//
-		TAG_FREQUENCY_CATEGORY: 10,
+		TAG_FREQUENCY_CATEGORY: 5,
 	 	TAG_LENGTH_CATEGORY: 2,
 		//
 		WORD_NOVELTY_PERCENT: 0.33,
@@ -52,6 +52,10 @@ export default function bundleArticles(articles, options = {}) {
 	let categoryBlob = ''
 
 	articles.map(article => {
+		// Ignore news source name
+		// TODO: Ignore domain name (cnn in www.cnn.org)
+		tagger.useStopWords([article.author])
+
 		let textBlob =
 			article.title
 			+article.keywords
@@ -63,17 +67,31 @@ export default function bundleArticles(articles, options = {}) {
 
 		textBlob = htmlToText.fromString(textBlob);
 		categoryBlob += textBlob
-		article.tagData = tagger.fromText(textBlob, opts.TAG_FREQUENCY_ARTICLE, opts.TAG_LENGTH_ARTICLE)
+
+		// Get article corpus tags
+		article.tagData = tagger
+			.fromText(textBlob,
+				opts.TAG_FREQUENCY_ARTICLE,
+				opts.TAG_LENGTH_ARTICLE)
+		article.tagData = article.tagData.filter(t => t.word.length >= 4)
+
+		// Simplify
 		article.tags = article.tagData.map(tag => tag.word)
 		article.tags.concat(article.keywords)
 
 		return article
 	})
 
-	let categoryTags = tagger.fromText(categoryBlob, opts.TAG_FREQUENCY_CATEGORY, opts.TAG_LENGTH_CATEGORY)
+	// Get category corpus tags
+	let categoryTags = tagger
+		.fromText(categoryBlob,
+			opts.TAG_FREQUENCY_CATEGORY,
+			opts.TAG_LENGTH_CATEGORY)
 
-	let bundle = {}
+	// Delete short strings
+	categoryTags = categoryTags.filter(t => t.word.length >= 4)
 
+	// Order from rarest to most common
 	categoryTags = categoryTags.sort((a,b)=> {
 		let aC = corpus.find(C => C.word == a.word)
 		let bC = corpus.find(C => C.word == b.word)
@@ -82,10 +100,11 @@ export default function bundleArticles(articles, options = {}) {
 		else
 			return 0
 	})
+
+	// Simplify
 	categoryTags = categoryTags.map(t => t.word)
 
-	// console.log(categoryTags)
-
+	let bundle = {}
 	categoryTags.forEach((tag,i,arr) => {
 		if(i > (arr.length * opts.WORD_NOVELTY_PERCENT)) return false
 		console.log(i,arr.length)

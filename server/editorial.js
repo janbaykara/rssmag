@@ -1,6 +1,7 @@
 import htmlToText from 'html-to-text'
 import autoTagger from 'auto-tagger'
 import corpus from 'subtlex-word-frequencies'
+import synonyms from 'synonyms'
 
 /**
  * @param {Array} articles Feedly entries
@@ -17,7 +18,7 @@ export default function bundleArticles(articles, options = {}) {
 		TAG_FREQUENCY_ARTICLE: 2,
 		TAG_LENGTH_ARTICLE: 2,
 		//
-		TAG_FREQUENCY_CATEGORY: 5,
+		TAG_FREQUENCY_CATEGORY: 20,
 	 	TAG_LENGTH_CATEGORY: 2,
 		//
 		WORD_NOVELTY_PERCENT: 0.33,
@@ -33,7 +34,7 @@ export default function bundleArticles(articles, options = {}) {
 	*/
 	var tagger = autoTagger
 	.useStopWords('en')
-	.useStopWords(['the','and'
+	.useStopWords([
 		// Technical
 		,'http','https','www','com','co','org','php','spip'
 		// Services
@@ -46,7 +47,7 @@ export default function bundleArticles(articles, options = {}) {
 		// Numbers
 		,'0','1','2','3','4','5','6','7','8','9','10'
 		// Things that should be auto-filtered
-		,'internationalviewpoint'
+		,'internationalviewpoint', 'cnn', 'bbc'
 	])
 
 	let categoryBlob = ''
@@ -63,9 +64,15 @@ export default function bundleArticles(articles, options = {}) {
 				// article.content ? article.content.content :
 				article.summary ? article.summary.content : ''
 			)
+
+		// Remove article title
 		textBlob = textBlob.replace(new RegExp(article.origin.title,'i'), '')
 
+		// Unformat
+		textBlob = textBlob.toLowerCase()
 		textBlob = htmlToText.fromString(textBlob);
+
+		// Add to category corpus
 		categoryBlob += textBlob
 
 		// Get article corpus tags
@@ -107,11 +114,26 @@ export default function bundleArticles(articles, options = {}) {
 	let bundle = {}
 	categoryTags.forEach((tag,i,arr) => {
 		if(i > (arr.length * opts.WORD_NOVELTY_PERCENT)) return false
-		console.log(i,arr.length)
+
+		let tagArr = [tag]
+		// Search snynoyms of this tag
+		let synons = synonyms(tag,'n')
+		if(synons) {
+			tagArr = tagArr.concat(synons)
+		}
+		// Search for this word without trailing s
+		if(tag.charAt(tag.length-1) == 's') {
+			tagArr.push(tag.slice(0,-1))
+		}
+
+		console.log(i, arr.length, tag, tagArr)
 
 		bundle[tag] = []
 		articles.forEach(article => {
-			if(article.tags.includes(tag) && (opts.EXCLUSIVE_BUNDLES_BOOL ? !article.bundle : true)) {
+			if(
+				tagArr.some(t => article.tags.includes(t))
+				&& (opts.EXCLUSIVE_BUNDLES_BOOL ? !article.bundle : true)
+			) {
 				article.bundle = tag
 				bundle[tag].push(article.title)
 			} else if(article.bundle) {

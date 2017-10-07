@@ -16,7 +16,7 @@ const api = axios.create({
 	},
 	adapter: setupCache({
 		store: new nodeJsonDriver({humanReadable: false}),
-	  maxAge: 1000 * 60 * 60 * 24 * 7,
+	  maxAge: 1000 * 60 * 60 * 4, //ms
 		debug: true,
     exclude: {
       query: false

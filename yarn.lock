@@ -161,13 +161,6 @@ axios-cache-adapter-node@1.5.7:
     axios "^0.16.2"
     lodash-es "^4.17.4"
 
-axios-cache-adapter@^1.5.0:
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/axios-cache-adapter/-/axios-cache-adapter-1.5.0.tgz#f1e2fd4730de3f2f0a73dfaf89414aaa63e50405"
-  dependencies:
-    axios "^0.16.2"
-    lodash-es "^4.17.4"
-
 axios@^0.16.2:
   version "0.16.2"
   resolved "https://registry.yarnpkg.com/axios/-/axios-0.16.2.tgz#ba4f92f17167dfbab40983785454b9ac149c3c6d"
@@ -1922,10 +1915,6 @@ kind-of@^4.0.0:
   dependencies:
     is-buffer "^1.1.5"
 
-koa-cache-lite@^3.8.2:
-  version "3.8.2"
-  resolved "https://registry.yarnpkg.com/koa-cache-lite/-/koa-cache-lite-3.8.2.tgz#3ada985a319e19b7587050ff3f8457a39a6e6f23"
-
 koa-compose@^3.0.0:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/koa-compose/-/koa-compose-3.2.1.tgz#a85ccb40b7d986d8e5a345b3a1ace8eabcf54de7"
@@ -1953,6 +1942,12 @@ koa-json@^2.0.2:
   dependencies:
     koa-is-json "1"
     streaming-json-stringify "3"
+
+koa-rest-cache@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/koa-rest-cache/-/koa-rest-cache-1.1.0.tgz#8aa4b18c6909f7a8d1feb74e7176d81fd57d52eb"
+  dependencies:
+    minimatch "^3.0.0"
 
 koa-router@^7.2.1:
   version "7.2.1"

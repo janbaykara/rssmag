@@ -1,25 +1,20 @@
 import dotenv from 'dotenv'
 import Koa from 'koa'
 import json from 'koa-json'
-import koaStatic from 'koa-static'
-import KoaRouter from 'koa-router'
-import cache from 'koa-cache-lite'
+import staticRoute from 'koa-static'
+import Router from 'koa-router'
+import cache from 'koa-rest-cache'
 //
 import bundleArticles from './editorial'
 import Feedly from './feedly'
 
 dotenv.config()
 const app = new Koa()
-const router =  new KoaRouter()
-
-cache.configure({
-	'/api/bundle/:streamId/:n': 30000
-}, {
-	debug: true
-})
+const router =  new Router()
 
 // e.g. http://localhost:3000/api/bundle/user%2F3a94abfc-0869-47f0-9e7c-892608dd551c%2Fcategory%2FPolitical%20Comment/100
 router.get('/api/bundle/:streamId/:n', async (ctx, next) => {
+	await next()
 	try {
 		let articleData = await Feedly.getEntries(ctx.params.streamId, ctx.params.n)
 		ctx.body = bundleArticles(articleData)
@@ -28,10 +23,14 @@ router.get('/api/bundle/:streamId/:n', async (ctx, next) => {
 	}
 })
 
+app.use(cache({
+  pattern: "/api/**/*",
+  maxAge: 1000 * 60 * 60 * 1 // ms
+}))
 app.use(json())
-app.use(cache.middleware())
 app.use(router.routes())
-app.use(koaStatic('./client/build'))
+app.use(router.allowedMethods())
+app.use(staticRoute('./client/build'))
 
 const port = 3001
 

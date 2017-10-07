@@ -27,7 +27,6 @@ export default function bundleArticles(articles, options = {}) {
 	}, options)
 
 	console.log(`Bundling ${articles.length} articles`)
-	console.log("Pre-gen bundle",articles.map(a=>a.generatedBundle))
 
 	/**
 	 * ARTICLE TAGGING
@@ -138,7 +137,7 @@ export default function bundleArticles(articles, options = {}) {
 					|| (!opts.EXCLUSIVE_BUNDLES_BOOL)
 				)
 			) {
-				console.log(`✅ Bundling in ${tag}: ${article.title}`)
+				// console.log(`✅ Bundling in ${tag}: ${article.title}`)
 				article.generatedBundle = tag
 				collection[tag].push(article)
 			} else if(article.generatedBundle) {

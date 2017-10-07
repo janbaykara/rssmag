@@ -2,6 +2,7 @@ import htmlToText from 'html-to-text'
 import autoTagger from 'auto-tagger'
 import corpus from 'subtlex-word-frequencies'
 import synonyms from 'synonyms'
+import URLdiegoPerini from './URLregex'
 
 /**
  * @param {Array} articles Feedly entries
@@ -26,13 +27,14 @@ export default function bundleArticles(articles, options = {}) {
 	}, options)
 
 	console.log(`Bundling ${articles.length} articles`)
+	console.log("Pre-gen bundle",articles.map(a=>a.generatedBundle))
 
 	/**
 	 * ARTICLE TAGGING
 	 * Generate structured thematic definition
 	 * IOT group articles later
 	*/
-	var tagger = autoTagger
+	const tagger = autoTagger
 	.useStopWords('en')
 	.useStopWords([
 		// Technical
@@ -125,19 +127,22 @@ export default function bundleArticles(articles, options = {}) {
 
 		let tagArr = tagArray(tag)
 
-		// console.log(i, arr.length, tag, tagArr)
+		// console.log(i, arr.length, tag)
 
 		collection[tag] = []
 		articles.forEach(article => {
 			if(
 				tagArr.some(t => article.tags.includes(t))
-				&& (opts.EXCLUSIVE_BUNDLES_BOOL ? article.generatedBundle === undefined : true)
+				&& (
+					(opts.EXCLUSIVE_BUNDLES_BOOL && !article.generatedBundle)
+					|| (!opts.EXCLUSIVE_BUNDLES_BOOL)
+				)
 			) {
 				console.log(`✅ Bundling in ${tag}: ${article.title}`)
 				article.generatedBundle = tag
 				collection[tag].push(article)
 			} else if(article.generatedBundle) {
-				// console.log(`✴️ Article is bundled in ${article.bundle}: ${article.title}`)
+				// console.log(`✴️ Article is bundled in ${article.generatedBundle}: ${article.title}`)
 				// console.log(`Article is bundled in ${article.generatedBundle}: ${article.title}`)
 			} else {
 				// console.log(`❌ No tags: ${article.title}`)
@@ -161,7 +166,7 @@ export default function bundleArticles(articles, options = {}) {
 			author: article.author,
 			engagementRate: article.engagementRate,
 			generatedBundle: article.generatedBundle,
-			summary: article.summary ? htmlToText.fromString(article.summary.content.substring(0,500)) : article.content ? htmlToText.fromString(article.content.content.substring(0,500)) : null,
+			summary: article.summary ? formatSummary(article.summary.content) : article.content ? formatSummary(article.content.content) : null,
 			visual: article.visual,
 			url: article.alternate.href
 		}))
@@ -186,4 +191,12 @@ function tagArray(tag, syns = true) {
 		tagArr.push(tag.slice(0,-1))
 	}
 	return tagArr
+}
+
+function formatSummary(text, maxlength = 500) {
+	text = htmlToText.fromString(text)
+	text = text.substring(0,500)
+	var urlTag = new RegExp('\\[?'+URLdiegoPerini+'\\]?','gi')
+	text = text.replace(urlTag, '')
+	return text
 }

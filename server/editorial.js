@@ -86,6 +86,13 @@ export default function bundleArticles(articles, options = {}) {
 		article.tags = article.tagData.map(tag => tag.word)
 		article.tags.concat(article.keywords)
 
+		let articleTags = []
+		article.tags.forEach(t => {
+			articleTags = articleTags.concat(tagArray(t,false))
+		})
+		article.tags = [...new Set(articleTags)]
+		// console.log(article.title,'\n',article.tags)
+
 		return article
 	})
 
@@ -115,16 +122,7 @@ export default function bundleArticles(articles, options = {}) {
 	categoryTags.forEach((tag,i,arr) => {
 		if(i > (arr.length * opts.WORD_NOVELTY_PERCENT)) return false
 
-		let tagArr = [tag]
-		// Search snynoyms of this tag
-		let synons = synonyms(tag,'n')
-		if(synons) {
-			tagArr = tagArr.concat(synons)
-		}
-		// Search for this word without trailing s
-		if(tag.charAt(tag.length-1) == 's') {
-			tagArr.push(tag.slice(0,-1))
-		}
+		let tagArr = tagArray(tag)
 
 		console.log(i, arr.length, tag, tagArr)
 
@@ -143,4 +141,20 @@ export default function bundleArticles(articles, options = {}) {
 	})
 
 	console.log(bundle)
+}
+
+function tagArray(tag, syns = true) {
+	let tagArr = [tag]
+	// Search snynoyms of this tag
+	if(syns) {
+		let synons = synonyms(tag,'n')
+		if(synons) {
+			tagArr = tagArr.concat(synons)
+		}
+	}
+	// Search for this word without trailing s
+	if(tag.charAt(tag.length-1) == 's') {
+		tagArr.push(tag.slice(0,-1))
+	}
+	return tagArr
 }

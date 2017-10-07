@@ -35,7 +35,7 @@ export default class nodeJsonDriver {
 			let key = this.toKey(url)
 			let result
 			try {
-				result = this._store.getData(key)
+				result = JSON.parse(JSON.stringify(this._store.getData(key)))
 			} catch(e) {
 				result = null
 			}

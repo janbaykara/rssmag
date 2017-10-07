@@ -36,8 +36,8 @@ function getEntries(streamId, requiredArticleN) {
 			.get(`streams/${encodeURIComponent(streamId)}/contents${continuation}`)
 			.catch((e)=>reject(e))
 			.then(res => {
-				console.log(`🎃 API access number __${res.headers['x-ratelimit-count']}__ - ${res.request.fromCache ? 'CACHED' : 'new data'}`)
-				console.log("🤢 contents/?continuation="+continuation, res.data.items.length)
+				// console.log(`🎃 API access number __${res.headers['x-ratelimit-count']}__ - ${res.request.fromCache ? 'CACHED' : 'new data'}`)
+				// console.log("🤢 contents/?continuation="+continuation, res.data.items.length)
 				articleData = articleData.concat(res.data.items)
 				if(articleData.length >= requiredArticleN || !res.data.continuation) {
 					console.log("😈 ARTICLEDATA acquired, no. of articles: ",articleData.length)

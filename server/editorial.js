@@ -117,30 +117,59 @@ export default function bundleArticles(articles, options = {}) {
 
 	// Simplify
 	categoryTags = categoryTags.map(t => t.word)
+	// TODO: Dedupe via synonyms
 
-	let bundle = {}
+	let collection = {}
 	categoryTags.forEach((tag,i,arr) => {
 		if(i > (arr.length * opts.WORD_NOVELTY_PERCENT)) return false
 
 		let tagArr = tagArray(tag)
 
-		console.log(i, arr.length, tag, tagArr)
+		// console.log(i, arr.length, tag, tagArr)
 
-		bundle[tag] = []
+		collection[tag] = []
 		articles.forEach(article => {
 			if(
 				tagArr.some(t => article.tags.includes(t))
-				&& (opts.EXCLUSIVE_BUNDLES_BOOL ? !article.bundle : true)
+				&& (opts.EXCLUSIVE_BUNDLES_BOOL ? article.generatedBundle === undefined : true)
 			) {
-				article.bundle = tag
-				bundle[tag].push(article.title)
-			} else if(article.bundle) {
-				// console.log(`Article is bundled in ${article.bundle}: ${article.title}`)
+				// console.log(`✅ Bundling in ${tag}: ${article.title}`)
+				article.generatedBundle = tag
+				collection[tag].push(article)
+			} else if(article.generatedBundle) {
+				// console.log(`✴️ Article is bundled in ${article.bundle}: ${article.title}`)
+				// console.log(`Article is bundled in ${article.generatedBundle}: ${article.title}`)
+			} else {
+				// console.log(`❌ No tags: ${article.title}`)
 			}
 		})
 	})
 
-	console.log(bundle)
+	// And the rest
+	collection['_unbundled'] = articles.filter(a => !a.generatedBundle)
+
+	Object.keys(collection).forEach(k => {
+		// Order each bundle by article's engagementRate
+		collection[k] = collection[k].sort((a,b)=>(b.engagementRate || 0) - (a.engagementRate || 0))
+
+		// And trim the payload
+		collection[k] = collection[k].map(article => ({
+			title: article.title,
+			published: article.published,
+			source: article.origin ? article.origin.title : null,
+			sourceURL: article.origin ? article.origin.htmlUrl : null,
+			author: article.author,
+			engagementRate: article.engagementRate,
+			generatedBundle: article.generatedBundle,
+			summary: article.summary ? htmlToText.fromString(article.summary.content.substring(0,500)) : article.content ? htmlToText.fromString(article.content.content.substring(0,500)) : null,
+			visual: article.visual,
+			url: article.alternate.href
+		}))
+	})
+
+	// console.log(collection)
+
+	return collection;
 }
 
 function tagArray(tag, syns = true) {

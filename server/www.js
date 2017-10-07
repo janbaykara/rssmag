@@ -10,32 +10,13 @@ dotenv.config()
 const app = new Koa()
 const router =  new KoaRouter()
 
-// 2. Fetch Feedly data
-// DOCS: https://developer.feedly.com/v3/sandbox/
-Feedly.api
-.get('categories')
-.catch(console.log)
-.then(res => {
-	console.log(`🎃 API access number __${res.headers['x-ratelimit-count']}__ - ${res.request.fromCache ? 'CACHED' : 'new data'}`)
-	console.log(`No of Categories: ${res.data.length}`)
-
-	// From above
-	const streamId = 'user/3a94abfc-0869-47f0-9e7c-892608dd551c/category/Political Comment'; // Political Comment
-	// const streamId = 'user/3a94abfc-0869-47f0-9e7c-892608dd551c/category/World News' // World News
-
-	Feedly.getEntries(streamId, 100)
-	.then((articleData) => {
-		bundleArticles(articleData)
-	})
-	.catch(console.log)
-})
-
-// 3. Categorise, bundle, format
-// 4. Send to UI for rendering
-router.get('/api/', async (ctx) => {
-	ctx.body = {
-		status: 'online',
-		resources: {}
+// e.g. http://localhost:3000/api/bundle/user%2F3a94abfc-0869-47f0-9e7c-892608dd551c%2Fcategory%2FPolitical%20Comment/100
+router.get('/api/bundle/:streamId/:n', async (ctx, next) => {
+	try {
+		let articleData = await Feedly.getEntries(ctx.params.streamId, ctx.params.n)
+		ctx.body = bundleArticles(articleData)
+	} catch(e) {
+		console.log(e)
 	}
 })
 

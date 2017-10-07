@@ -1,6 +1,9 @@
+import dotenv from 'dotenv'
 import axios from 'axios'
 import { setupCache } from 'axios-cache-adapter-node'
 import nodeJsonDriver from './nodeJsonDriver'
+
+dotenv.config()
 
 // 1. Feedly OAuth2
 // - Using dev token for now
@@ -30,7 +33,7 @@ function getEntries(streamId, requiredArticleN) {
 
 		function fetch() {
 			return api
-			.get(`streams/${encodeURIComponent(streamId)}/contents?continuation=${continuation}`)
+			.get(`streams/${encodeURIComponent(streamId)}/contents${continuation ? `?continuation=${continuation}` : ''}`)
 			.catch((e)=>reject(e))
 			.then(res => {
 				console.log(`🎃 API access number __${res.headers['x-ratelimit-count']}__ - ${res.request.fromCache ? 'CACHED' : 'new data'}`)

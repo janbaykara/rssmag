@@ -1,5 +1,16 @@
+@import url('https://fonts.googleapis.com/css?family=Libre+Baskerville|Rubik:200,400,500,600,800&subset=latin-ext');
+/* |PT+Sans|PT+Sans+Narrow */
+
 body {
   margin: 0;
   padding: 0;
-  font-family: sans-serif;
+  font-family: 'Rubik', sans-serif;
+}
+
+.rubik {
+  font-family: 'Rubik', sans-serif;
+}
+
+.baskerville {
+  font-family: 'Libre Baskerville', serif;
 }

@@ -36,7 +36,7 @@ function getEntries(streamId, requiredArticleN) {
 			.get(`streams/${encodeURIComponent(streamId)}/contents${continuation}`)
 			.catch((e)=>reject(e))
 			.then(res => {
-				// console.log(`🎃 API access number __${res.headers['x-ratelimit-count']}__ - ${res.request.fromCache ? 'CACHED' : 'new data'}`)
+				console.log(`🎃 API access number __${res.headers['x-ratelimit-count']}__ - ${res.request.fromCache ? 'CACHED' : 'new data'}`)
 				// console.log("🤢 contents/?continuation="+continuation, res.data.items.length)
 				articleData = articleData.concat(res.data.items)
 				if(articleData.length >= requiredArticleN || !res.data.continuation) {
@@ -44,7 +44,7 @@ function getEntries(streamId, requiredArticleN) {
 					return resolve(articleData)
 				} else if(res.data.continuation) {
 					continuation = `?continuation=${res.data.continuation}`
-					console.log("Next continuation stream: ",res.data.continuation)
+					// console.log("Next continuation stream: ",res.data.continuation)
 					return fetch()
 				}
 			})

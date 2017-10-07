@@ -133,7 +133,7 @@ export default function bundleArticles(articles, options = {}) {
 				tagArr.some(t => article.tags.includes(t))
 				&& (opts.EXCLUSIVE_BUNDLES_BOOL ? article.generatedBundle === undefined : true)
 			) {
-				// console.log(`✅ Bundling in ${tag}: ${article.title}`)
+				console.log(`✅ Bundling in ${tag}: ${article.title}`)
 				article.generatedBundle = tag
 				collection[tag].push(article)
 			} else if(article.generatedBundle) {

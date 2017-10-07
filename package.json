@@ -22,7 +22,8 @@
     "koa": "^2.3.0",
     "koa-router": "^7.2.1",
     "koa-static": "^4.0.1",
-    "node-json-db": "^0.7.3"
+    "node-json-db": "^0.7.3",
+    "subtlex-word-frequencies": "^1.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

@@ -1,5 +1,6 @@
 import htmlToText from 'html-to-text'
 import autoTagger from 'auto-tagger'
+import corpus from 'subtlex-word-frequencies'
 
 /**
  * @param {Array} articles Feedly entries
@@ -13,11 +14,14 @@ import autoTagger from 'auto-tagger'
 
 export default function bundleArticles(articles, options = {}) {
 	const opts = Object.assign({},{
-		TAG_FREQUENCY_ARTICLE: 3,
-		TAG_LENGTH_ARTICLE: 3,
+		TAG_FREQUENCY_ARTICLE: 2,
+		TAG_LENGTH_ARTICLE: 2,
 		//
-		TAG_FREQUENCY_CATEGORY: 7,
-	 	TAG_LENGTH_CATEGORY: 3,
+		TAG_FREQUENCY_CATEGORY: 10,
+	 	TAG_LENGTH_CATEGORY: 2,
+		//
+		WORD_NOVELTY_PERCENT: 0.33,
+		EXCLUSIVE_BUNDLES_BOOL: true,
 	}, options)
 
 	console.log(`Bundling ${articles.length} articles`)
@@ -70,10 +74,25 @@ export default function bundleArticles(articles, options = {}) {
 
 	let bundle = {}
 
-	categoryTags.map(t=>t.word).forEach(tag => {
+	categoryTags = categoryTags.sort((a,b)=> {
+		let aC = corpus.find(C => C.word == a.word)
+		let bC = corpus.find(C => C.word == b.word)
+		if(aC && bC)
+			return aC.count - bC.count
+		else
+			return 0
+	})
+	categoryTags = categoryTags.map(t => t.word)
+
+	// console.log(categoryTags)
+
+	categoryTags.forEach((tag,i,arr) => {
+		if(i > (arr.length * opts.WORD_NOVELTY_PERCENT)) return false
+		console.log(i,arr.length)
+
 		bundle[tag] = []
 		articles.forEach(article => {
-			if(article.tags.includes(tag) && !article.bundle) {
+			if(article.tags.includes(tag) && (opts.EXCLUSIVE_BUNDLES_BOOL ? !article.bundle : true)) {
 				article.bundle = tag
 				bundle[tag].push(article.title)
 			} else if(article.bundle) {

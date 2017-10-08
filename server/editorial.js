@@ -19,7 +19,7 @@ const tagger = autoTagger
 	// Numbers
 	,'0','1','2','3','4','5','6','7','8','9','10'
 	// Things that should be auto-filtered
-	,'internationalviewpoint', 'cnn', 'bbc', 'order order'
+	,'internationalviewpoint', 'cnn', 'bbc', 'order order', 'theguardian', 'times'
 ])
 
 /**
@@ -36,8 +36,8 @@ export default function bundleArticles(articles, options = {}) {
 	 	TAG_MAX_WORDS_CATEGORY: 2,
 		//
 		TAG_MIN_CHAR_LENGTH: 5,
-		TAG_NOVELTY_PERCENT: 0.20,
-		BUNDLE_SIZE_MIN: 3,
+		TAG_NOVELTY_PERCENT: 0.05,
+		BUNDLE_SIZE_MIN: 2,
 		BUNDLE_SIZE_MAX: 7,
 		//
 		EXCLUSIVE_BUNDLES_BOOL: true,

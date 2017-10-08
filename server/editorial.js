@@ -249,6 +249,9 @@ export default function bundleArticles(articles, options = {}) {
 		return b.articles.length - a.articles.length
 	})
 
+	collection.unbundled = collection.unbundled.map(articleFormatting)
+	collection.unbundled.sort((a,b) => (b.engagementRate || 0) - (a.engagementRate || 0));
+
 	// console.log(collection)
 
 	return collection;

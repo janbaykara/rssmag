@@ -208,7 +208,7 @@ export default function bundleArticles(articles, options = {}) {
 
 	console.log(`\n
 		🍾🎉🤓 Bundling complete.
-		\n${Object.keys(collection.bundles).length - 1} bundles containing ${articles.length-collection.unbundled.length}/${articles.length} articles.
+		\n${Object.keys(collection.bundles).length} bundles containing ${articles.length-collection.unbundled.length}/${articles.length} articles.
 		\n`);
 
 	/**
@@ -219,29 +219,16 @@ export default function bundleArticles(articles, options = {}) {
 	Object.keys(collection.bundles).forEach(k => {
 		// Order each bundle by article's engagementRate
 		collection.bundles[k] = collection.bundles[k].sort((a,b)=>(b.engagementRate || 0) - (a.engagementRate || 0))
-
 		// And trim the payload
-		collection.bundles[k] = collection.bundles[k].map(article => ({
-			title: article.title,
-			published: article.published,
-			source: article.origin ? article.origin.title : null,
-			sourceURL: article.origin ? article.origin.htmlUrl : null,
-			author: article.author,
-			engagementRate: article.engagementRate,
-			assignedBundle: article.assignedBundle,
-			summary: article.summary ? formatSummary(article.summary.content) : article.content ? formatSummary(article.content.content) : null,
-			visual: article.visual,
-			url: article.alternate.href
-		}))
+		collection.bundles[k] = collection.bundles[k].map(articleFormatting)
 	})
 
+	// Order bundles by length +-, avgEngagement +-
 	collection.bundles = Object.keys(collection.bundles).map(k => ({ name: k, articles: collection.bundles[k] }))
 	collection.bundles.forEach(b => {
 		b.aggEngagementRate = b.articles.reduce(x=>x.engagementRate || 0)
 		b.avgEngagementRate = b.aggEngagementRate / b.articles.length
 	})
-
-	// Order bundles by length +-, avgEngagement +-
 	collection.bundles.sort((a,b) => {
 		if(b.articles.length === a.articles.length) {
 			return b.avgEngagementRate - a.avgEngagementRate
@@ -256,12 +243,25 @@ export default function bundleArticles(articles, options = {}) {
 
 	return collection;
 
-
-
-
 	/**
 	 * UTILS
 	*/
+
+	function articleFormatting(article) {
+		return {
+			title: article.title,
+			published: article.published,
+			source: article.origin ? article.origin.title : null,
+			sourceURL: article.origin ? article.origin.htmlUrl : null,
+			author: article.author,
+			engagementRate: Number(article.engagementRate || 0),
+			assignedBundle: article.assignedBundle,
+			summary: article.summary ? formatSummary(article.summary.content) : article.content ? formatSummary(article.content.content) : null,
+			visual: article.visual,
+			url: article.alternate[0].href
+		}
+	}
+
 	function formatSummary(text, maxlength = opts.SNIPPET_MAX_LENGTH, minlength = opts.SNIPPET_MIN_LENGTH) {
 		text = htmlToText.fromString(text)
 		if(text.length < minlength) return null

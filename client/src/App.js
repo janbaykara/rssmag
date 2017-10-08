@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import 'tachyons';
 import NewsBundle from './components/NewsBundle'
 import NewsArticle from './components/NewsArticle'
-import Middot from './components/Middot'
 
 // fetch
 
@@ -11,7 +10,9 @@ class App extends Component {
     super(props)
 
     this.state = { }
+  }
 
+  componentDidMount() {
   	const streamId = 'user/3a94abfc-0869-47f0-9e7c-892608dd551c/category/Political Comment'; // Political Comment
   	// const streamId = 'user/3a94abfc-0869-47f0-9e7c-892608dd551c/category/World News' // World News
     this.fetchCategories()
@@ -36,18 +37,22 @@ class App extends Component {
   render() {
     return (
       <div>
-        <header className='w-100 pa3'>
-          <div className='fw9 f3'>RSSMAG</div>
-          <nav>{
+        <header className='w-100 pa3 pb0 mb2'>
+            <span className='fw9 f3 v-mid dib mr1 mb1'>RSSMAG</span>
+            {
             this.state.categories ? this.state.categories.map(cat => (
-              <Middot className='fw6 f5 pa2 dib pointer dim'><a key={cat.id}
-                className='link'
-                onClick={(e) => this.fetchStream(cat.id)}
-                title={cat.description}>{cat.label}</a></Middot>
+              <span
+                key={cat.id}
+                className='v-mid fw6 f6 pa2 dib pointer dim bg-black-10 black-80 br2 mr1 mb1'>
+                <a
+                  className='link'
+                  onClick={(e) => this.fetchStream(cat.id)}
+                  title={cat.description}>{cat.label}</a>
+              </span>
             )) : <div className='tc moon-gray w-100 f3 fw9'>Loading</div>
-          }</nav>
+            }
         </header>
-        <main className='flex flex-wrap items-start items-stretch pa3'>
+        <main className='flex flex-wrap items-start items-stretch pa3 pt0'>
           {this.state.stream ? this.state.stream.bundles.map(bundle =>
             (bundle.articles.length > 0 &&
               <NewsBundle
@@ -56,7 +61,9 @@ class App extends Component {
                 bundle={bundle.articles} />)
           ): <div className='tc moon-gray w-100 pa7 f1 fw9'>Loading</div>}
           {this.state.stream && this.state.stream.unbundled.map((a,i) => (
-						<NewsArticle key={i} index={i} article={a} />
+						<div key={i} className='w-100 w-50-ns w-25-l pa1 flex flex-column items-stretch'>
+              <NewsArticle index={i} article={a} />
+            </div>
           ))}
         </main>
       </div>

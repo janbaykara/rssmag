@@ -121,37 +121,69 @@ export default function bundleArticles(articles, options = {}) {
 	categoryTags = categoryTags.map(t => t.word)
 	// TODO: Dedupe via synonyms
 
-	let collection = {}
-	categoryTags.forEach((tag,i,arr) => {
-		if(i > (arr.length * opts.WORD_NOVELTY_PERCENT)) return false
+	let collection = {};
+	let retries = {};
+	let tryN = 1;
 
-		let tagArr = tagArray(tag)
+	(function assignArticlesToBundles() {
+		console.log(`🐝 BUNDLING ATTEMPT ${tryN}`)
 
-		// console.log(i, arr.length, tag)
+		categoryTags.forEach((tag,i,arr) => {
+			if(i > (arr.length * opts.WORD_NOVELTY_PERCENT)) return false
 
-		collection[tag] = []
-		articles.forEach(article => {
-			if(
-				tagArr.some(t => article.tags.includes(t))
-				&& (
-					(opts.EXCLUSIVE_BUNDLES_BOOL && !article.generatedBundle)
-					|| (!opts.EXCLUSIVE_BUNDLES_BOOL)
-				)
-			) {
-				// console.log(`✅ Bundling in ${tag}: ${article.title}`)
-				article.generatedBundle = tag
-				collection[tag].push(article)
-			} else if(article.generatedBundle) {
-				// console.log(`✴️ Article is bundled in ${article.generatedBundle}: ${article.title}`)
-				// console.log(`Article is bundled in ${article.generatedBundle}: ${article.title}`)
-			} else {
-				// console.log(`❌ No tags: ${article.title}`)
-			}
+			let tagArr = tagArray(tag)
+
+			// console.log(i, arr.length, tag)
+
+			collection[tag] = collection[tag] || []
+			articles.forEach(article => {
+				if(
+					tagArr.some(t => article.tags.includes(t))
+					&& (
+						(opts.EXCLUSIVE_BUNDLES_BOOL && !article.assignedBundle)
+						|| (!opts.EXCLUSIVE_BUNDLES_BOOL)
+					)
+				) {
+					// if(tryN === 1) {
+					// 	console.log(`✅ Bundling in ${tag}: ${article.title}`)
+					// } else {
+					// 	console.log(`✴️➡️ Moving to ${tag}: ${article.title}`)
+					// }
+					article.assignedBundle = tag
+					collection[tag].push(article)
+				} else if(article.assignedBundle) {
+					// console.log(`✴️ Article is bundled in ${article.assignedBundle}: ${article.title}`)
+					// console.log(`Article is bundled in ${article.assignedBundle}: ${article.title}`)
+				} else {
+					// console.log(`❌ No tags: ${article.title}`)
+				}
+			})
 		})
-	})
+
+		tryN++
+
+		// Remove single-article bundles and try again
+		let lonelyBundles = Object.keys(collection).filter(k => collection[k].length === 1);
+		if(lonelyBundles.length > 0) {
+			console.log(`😡 lonely bundles: ${lonelyBundles.length}`)
+			lonelyBundles.forEach(k => {
+				retries[k] = retries[k] ? retries[k] + 1 : 2;
+				// console.log('👺 Deleting tag ',k, collection[k].length);
+				delete collection[k][0].assignedBundle;
+				delete collection[k];
+				categoryTags.splice(categoryTags.indexOf(k),1);
+			})
+
+			// Don't keep going if the articles have no place else to go
+			let sortedLonelies = Object.keys(retries).map(k => retries[k]).sort((a,b) => b - a);
+			if(sortedLonelies[0] <= sortedLonelies[1] && categoryTags.length > 0) {
+				assignArticlesToBundles()
+			}
+		}
+	})()
 
 	// And the rest
-	collection['_unbundled'] = articles.filter(a => !a.generatedBundle)
+	collection['_unbundled'] = articles.filter(a => !a.assignedBundle)
 
 	Object.keys(collection).forEach(k => {
 		// Order each bundle by article's engagementRate
@@ -165,7 +197,7 @@ export default function bundleArticles(articles, options = {}) {
 			sourceURL: article.origin ? article.origin.htmlUrl : null,
 			author: article.author,
 			engagementRate: article.engagementRate,
-			generatedBundle: article.generatedBundle,
+			assignedBundle: article.assignedBundle,
 			summary: article.summary ? formatSummary(article.summary.content) : article.content ? formatSummary(article.content.content) : null,
 			visual: article.visual,
 			url: article.alternate.href

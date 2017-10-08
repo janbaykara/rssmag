@@ -66,8 +66,9 @@ export default function bundleArticles(articles, options = {}) {
 				article.summary ? article.summary.content : ''
 			)
 
-		// Remove article title
-		textBlob = textBlob.replace(new RegExp(article.origin.title,'i'), '')
+		// Remove source name
+		textBlob = textBlob.replace(new RegExp(article.origin.title,'gi'), '')
+		textBlob = textBlob.replace(new RegExp(article.author,'gi'), '')
 
 		// Unformat
 		textBlob = textBlob.toLowerCase()
@@ -192,9 +193,10 @@ function tagArray(tag, syns = true) {
 	return tagArr
 }
 
-function formatSummary(text, maxlength = 500) {
+function formatSummary(text, maxlength = 350, minlength = 100) {
 	text = htmlToText.fromString(text)
-	text = text.substring(0,500)
+	if(text.length < minlength) return null
+	text = text.substring(0,maxlength)
 	var urlTag = new RegExp('\\[?'+URLdiegoPerini+'\\]?','gi')
 	text = text.replace(urlTag, '')
 	return text

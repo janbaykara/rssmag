@@ -36,16 +36,18 @@ export default function bundleArticles(articles, options = {}) {
 	 	TAG_MAX_WORDS_CATEGORY: 2,
 		//
 		TAG_MIN_CHAR_LENGTH: 5,
-		TAG_NOVELTY_PERCENT: 0.33,
-		BUNDLE_SIZE_MIN: 2,
+		TAG_NOVELTY_PERCENT: 0.20,
+		BUNDLE_SIZE_MIN: 3,
 		BUNDLE_SIZE_MAX: 7,
+		//
 		EXCLUSIVE_BUNDLES_BOOL: true,
+		CATEGORY_CORPUS: false,
 		//
 		SNIPPET_MIN_LENGTH: 100,
 		SNIPPET_MAX_LENGTH: 350,
-	}, options)
+	}, options);
 
-	console.log(`Bundling ${articles.length} articles`)
+	console.log(`Bundling ${articles.length} articles`);
 
 	/**
 	 * ARTICLE TAGGING
@@ -53,7 +55,7 @@ export default function bundleArticles(articles, options = {}) {
 	 * IOT group articles later
 	*/
 
-	let categoryBlob = ''
+	if(opts.CATEGORY_CORPUS) var categoryBlob = ''
 
 	articles.map(article => {
 		// Ignore news source name
@@ -77,7 +79,7 @@ export default function bundleArticles(articles, options = {}) {
 		textBlob = htmlToText.fromString(textBlob);
 
 		// Add to category corpus
-		categoryBlob += textBlob
+		if(opts.CATEGORY_CORPUS) categoryBlob += textBlob
 
 		// Get article corpus tags
 		article.tagData = tagger
@@ -88,7 +90,7 @@ export default function bundleArticles(articles, options = {}) {
 
 		// Simplify
 		article.tags = article.tagData.map(tag => tag.word)
-		article.tags.concat(article.keywords)
+		// article.tags = article.tags.concat(article.keywords)
 
 		let articleTags = []
 		article.tags.forEach(t => {
@@ -106,29 +108,41 @@ export default function bundleArticles(articles, options = {}) {
 	 * Generate category-level tags
 	 * Using categoryBlob corpus assembled above
 	*/
+	let categoryTags
 
-	// Get category corpus tags
-	let categoryTags = tagger
-		.fromText(categoryBlob,
-			opts.TAG_MIN_FREQUENCY_CATEGORY,
-			opts.TAG_MAX_WORDS_CATEGORY)
+	if(opts.CATEGORY_CORPUS) {
+		// Either create new, high-level tags
+		// 	from a category corpus tags
+		categoryTags = tagger
+			.fromText(categoryBlob,
+				opts.TAG_MIN_FREQUENCY_CATEGORY,
+				opts.TAG_MAX_WORDS_CATEGORY)
+
+		// Simplify
+		categoryTags = categoryTags.map(t => t.word)
+	} else {
+		// Or aggregate article-level tags
+		categoryTags = []
+
+		articles.forEach(a => {
+			categoryTags = categoryTags.concat(a.tags)
+		})
+
+		categoryTags = [...new Set(categoryTags)]
+	}
 
 	// Delete short strings
-	categoryTags = categoryTags.filter(t => t.word.length >= opts.TAG_MIN_CHAR_LENGTH)
+	categoryTags = categoryTags.filter(t => t.length >= opts.TAG_MIN_CHAR_LENGTH)
 
-	// Order from rarest to most common
+	// Order most common
 	categoryTags = categoryTags.sort((a,b)=> {
-		let aC = corpus.find(C => C.word == a.word)
-		let bC = corpus.find(C => C.word == b.word)
+		let aC = corpus.find(C => C.word == a)
+		let bC = corpus.find(C => C.word == b)
 		if(aC && bC)
-			return aC.count - bC.count
+			return bC.count - aC.count
 		else
 			return 0
 	})
-
-	// Simplify
-	categoryTags = categoryTags.map(t => t.word)
-	// TODO: Dedupe via synonyms
 
 
 	/**
@@ -148,9 +162,9 @@ export default function bundleArticles(articles, options = {}) {
 		categoryTags.forEach((tag,i,arr) => {
 			if(i > (arr.length * opts.TAG_NOVELTY_PERCENT)) return false
 
-			let tagArr = tagArray(tag)
+			let tagArr = tagArray(tag, true)
 
-			// console.log(i, arr.length, tag)
+			console.log(`${i} / ${arr.length} - ${tag} (${tagArr.length})`)
 
 			collection.bundles[tag] = collection.bundles[tag] || []
 			articles.forEach(article => {
@@ -207,8 +221,8 @@ export default function bundleArticles(articles, options = {}) {
 	collection.unbundled = articles.filter(a => !a.assignedBundle);
 
 	console.log(`\n
-		🍾🎉🤓 Bundling complete.
-		\n${Object.keys(collection.bundles).length} bundles containing ${articles.length-collection.unbundled.length}/${articles.length} articles.
+		🍾🎉🤓 Bundling complete.\n
+		${Object.keys(collection.bundles).length} bundles containing ${articles.length-collection.unbundled.length}/${articles.length} articles.
 		\n`);
 
 	/**
@@ -249,6 +263,7 @@ export default function bundleArticles(articles, options = {}) {
 
 	function articleFormatting(article) {
 		return {
+			id: article.id,
 			title: article.title,
 			published: article.published,
 			source: article.origin ? article.origin.title : null,

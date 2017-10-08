@@ -143,7 +143,6 @@ export default function bundleArticles(articles, options = {}) {
 		return aC - bC
 	})
 
-
 	/**
 	 * BUNDLE ARTICLES
 	 * Group articles around the category-level tags
@@ -151,7 +150,9 @@ export default function bundleArticles(articles, options = {}) {
 	 * 	or this is no longer possible
 	*/
 
-	let collection = {bundles:{}, unbundled:[]};
+	console.log(`Extracted ${categoryTags.length} tags.`)
+
+	let stream = {bundles:{}, unbundled:[]};
 	let retries = {};
 	let tryN = 1;
 
@@ -165,7 +166,7 @@ export default function bundleArticles(articles, options = {}) {
 
 			console.log(`${i} / ${arr.length} - ${tag} (${tagArr.length})`)
 
-			collection.bundles[tag] = collection.bundles[tag] || []
+			stream.bundles[tag] = stream.bundles[tag] || []
 			articles.forEach(article => {
 				if(
 					tagArr.some(t => article.tags.includes(t))
@@ -180,7 +181,7 @@ export default function bundleArticles(articles, options = {}) {
 					// 	console.log(`✴️➡️ Moving to ${tag}: ${article.title}`)
 					// }
 					article.assignedBundle = tag
-					collection.bundles[tag].push(article)
+					stream.bundles[tag].push(article)
 				} else if(article.assignedBundle) {
 					// console.log(`✴️ Article is bundled in ${article.assignedBundle}: ${article.title}`)
 					// console.log(`Article is bundled in ${article.assignedBundle}: ${article.title}`)
@@ -193,18 +194,18 @@ export default function bundleArticles(articles, options = {}) {
 		tryN++;
 
 		// Remove single-article bundles and try again
-		let deviantBundles = Object.keys(collection.bundles).filter(k => collection.bundles[k].length < opts.BUNDLE_SIZE_MIN || collection.bundles[k].length > opts.BUNDLE_SIZE_MAX);
+		let deviantBundles = Object.keys(stream.bundles).filter(k => stream.bundles[k].length < opts.BUNDLE_SIZE_MIN || stream.bundles[k].length > opts.BUNDLE_SIZE_MAX);
 		if(deviantBundles.length > 0) {
 			console.log(`😡 Deviant bundles: ${deviantBundles.length}`)
 			deviantBundles.forEach(k => {
 				retries[k] = retries[k] ? retries[k] + 1 : 2;
-				// console.log('⛔️ Deleting tag ',k, collection.bundles[k].length);
-				collection.bundles[k].forEach(A => {
+				// console.log('⛔️ Deleting tag ',k, stream.bundles[k].length);
+				stream.bundles[k].forEach(A => {
 					// console.log("SHOULD have assignedBundle", articles.find(a=>a.title === A.title).assignedBundle)
 					delete A.assignedBundle
 					// console.log("Shouldn't have assignedBundle", articles.find(a=>a.title === A.title).assignedBundle)
 				})
-				delete collection.bundles[k];
+				delete stream.bundles[k];
 				categoryTags.splice(categoryTags.indexOf(k),1);
 			})
 
@@ -217,11 +218,11 @@ export default function bundleArticles(articles, options = {}) {
 	})();
 
 	// And the rest
-	collection.unbundled = articles.filter(a => !a.assignedBundle);
+	stream.unbundled = articles.filter(a => !a.assignedBundle);
 
 	console.log(`\n
 		🍾🎉🤓 Bundling complete.\n
-		${Object.keys(collection.bundles).length} bundles containing ${articles.length-collection.unbundled.length}/${articles.length} articles.
+		${Object.keys(stream.bundles).length} bundles containing ${articles.length-stream.unbundled.length}/${articles.length} articles.
 		\n`);
 
 	/**
@@ -229,32 +230,32 @@ export default function bundleArticles(articles, options = {}) {
 	 * Prepare data for UI
 	*/
 
-	Object.keys(collection.bundles).forEach(k => {
+	Object.keys(stream.bundles).forEach(k => {
 		// Order each bundle by article's engagementRate
-		collection.bundles[k] = collection.bundles[k].sort((a,b)=>(b.engagementRate || 0) - (a.engagementRate || 0))
+		stream.bundles[k] = stream.bundles[k].sort((a,b)=>(b.engagementRate || 0) - (a.engagementRate || 0))
 		// And trim the payload
-		collection.bundles[k] = collection.bundles[k].map(articleFormatting)
+		stream.bundles[k] = stream.bundles[k].map(articleFormatting)
 	})
 
 	// Order bundles by length +-, avgEngagement +-
-	collection.bundles = Object.keys(collection.bundles).map(k => ({ name: k, articles: collection.bundles[k] }))
-	collection.bundles.forEach(b => {
+	stream.bundles = Object.keys(stream.bundles).map(k => ({ name: k, articles: stream.bundles[k] }))
+	stream.bundles.forEach(b => {
 		b.aggEngagementRate = b.articles.reduce(x=>x.engagementRate || 0)
 		b.avgEngagementRate = b.aggEngagementRate / b.articles.length
 	})
-	collection.bundles.sort((a,b) => {
+	stream.bundles.sort((a,b) => {
 		if(b.articles.length === a.articles.length) {
 			return b.avgEngagementRate - a.avgEngagementRate
 		}
 		return b.articles.length - a.articles.length
 	})
 
-	collection.unbundled = collection.unbundled.map(articleFormatting)
-	collection.unbundled.sort((a,b) => (b.engagementRate || 0) - (a.engagementRate || 0));
+	stream.unbundled = stream.unbundled.map(articleFormatting)
+	stream.unbundled.sort((a,b) => (b.engagementRate || 0) - (a.engagementRate || 0));
 
-	// console.log(collection)
+	// console.log(stream)
 
-	return collection;
+	return stream;
 
 	/**
 	 * UTILS

@@ -134,14 +134,13 @@ export default function bundleArticles(articles, options = {}) {
 	// Delete short strings
 	categoryTags = categoryTags.filter(t => t.length >= opts.TAG_MIN_CHAR_LENGTH)
 
-	// Order most common
+	// Order least common
 	categoryTags = categoryTags.sort((a,b)=> {
 		let aC = corpus.find(C => C.word == a)
+		let aCCount = aC ? aC.count : 0
 		let bC = corpus.find(C => C.word == b)
-		if(aC && bC)
-			return bC.count - aC.count
-		else
-			return 0
+		let bCCount = bC ? bC.count : 0
+		return aC - bC
 	})
 
 

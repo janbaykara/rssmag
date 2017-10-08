@@ -48,8 +48,12 @@ class App extends Component {
           }</nav>
         </header>
         <main className='flex flex-wrap items-start items-stretch pa3'>
-          {this.state.collection ? Object.keys(this.state.collection).map(bundle =>
-            (this.state.collection[bundle].length > 0 && <NewsBundle key={bundle} bundle={this.state.collection[bundle]} />)
+          {this.state.stream ? Object.keys(this.state.stream).map(bundle =>
+            (this.state.stream[bundle].length > 0 &&
+              <NewsBundle
+                key={bundle}
+                bundleName={bundle}
+                bundle={this.state.stream[bundle]} />)
           ): <Loading />}
         </main>
       </div>

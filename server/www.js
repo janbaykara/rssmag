@@ -12,17 +12,18 @@ dotenv.config()
 const app = new Koa()
 const router =  new Router()
 
-// e.g. http://localhost:3000/api/bundle/user%2F3a94abfc-0869-47f0-9e7c-892608dd551c%2Fcategory%2FPolitical%20Comment/100
+// e.g. http://localhost:3001/api/feedly/categories
 router.get('/api/feedly/:endpoint', async (ctx, next) => {
 	await next()
 	try {
 		let res = await Feedly.api.get(ctx.params.endpoint)
-		ctx.body = res
+		ctx.body = res.data
 	} catch(e) {
 		console.log(e)
 	}
 })
 
+// e.g. http://localhost:3000/api/bundle/user%2F3a94abfc-0869-47f0-9e7c-892608dd551c%2Fcategory%2FPolitical%20Comment/100
 router.get('/api/bundle/:streamId/:n', async (ctx, next) => {
 	await next()
 	try {

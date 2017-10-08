@@ -1,12 +1,6 @@
 import React, { Component } from 'react';
 import 'tachyons';
-import styled from 'styled-components';
-
-const Middot = styled.span`
-	& + &:before {
-		content: " \00b7  ";
-	}
-`
+import Middot from './Middot'
 
 export default class NewsArticle extends Component {
   render() {

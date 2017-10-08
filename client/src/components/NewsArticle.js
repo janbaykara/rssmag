@@ -22,7 +22,7 @@ export default class NewsArticle extends Component {
 							)
 							:
 							(index === 0 && article.engagementRate > 1) ? (
-								<div className='fw1 f2 mb2'><span className='orange'>{article.engagementRate}</span> {article.title}</div>
+								<div className='fw4 f2 mb2'><span className='orange'>{article.engagementRate}</span> {article.title}</div>
 							)
 							:
 							(index > 0 && article.engagementRate > 1) ? (
@@ -38,7 +38,7 @@ export default class NewsArticle extends Component {
 								{article.published && <Middot>{date.toLocaleDateString('en-GB')}</Middot>}
 							</div>
 							{(index === 0 && article.engagementRate > 0.5) && (
-								<p className='baskerville black-70 lh-title' style={{wordWrap: 'break-word'}}>{article.summary}</p>
+								<p className='baskerville black-80 lh-title' style={{wordWrap: 'break-word'}}>{article.summary}</p>
 							)}
 						</div>
 					</a>

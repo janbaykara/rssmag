@@ -12,7 +12,7 @@ export default function BundleView({stream}) {
 						key={bundle.name}
 						bundleName={bundle.name}
 						bundle={bundle.articles} />)
-			): <div className='tc moon-gray w-100 pa7 f1 fw9'>Loading</div>}
+			): <div className='tc moon-gray w-100 pa7 f1 fw9'>LOADING</div>}
 			{stream && stream.unbundled.map((a,i) => (
 				<div key={i} className='w-100 w-50-ns w-25-l pa1 flex flex-column items-stretch'>
 					<NewsArticle index={i} article={a} />

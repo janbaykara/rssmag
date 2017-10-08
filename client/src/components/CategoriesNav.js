@@ -16,6 +16,7 @@ export default function CategoriesNav({categories, fetchStream}) {
 							title={cat.description}>{cat.label}</a>
 					</span>
 				)) : <div className='tc moon-gray w-100 f3 fw9'>Loading</div>
+				)) : <div className='tc moon-gray w-100 f3 fw9'>LOADING</div>
 				}
 		</header>
 	)

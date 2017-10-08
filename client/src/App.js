@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import 'tachyons';
-import Loading from './components/Loading'
 import NewsBundle from './components/NewsBundle'
+import NewsArticle from './components/NewsArticle'
 import Middot from './components/Middot'
 
 // fetch
@@ -44,17 +44,20 @@ class App extends Component {
                 className='link'
                 onClick={(e) => this.fetchStream(cat.id)}
                 title={cat.description}>{cat.label}</a></Middot>
-            )) : <Loading />
+            )) : <div className='tc moon-gray w-100 f3 fw9'>Loading</div>
           }</nav>
         </header>
         <main className='flex flex-wrap items-start items-stretch pa3'>
-          {this.state.stream ? Object.keys(this.state.stream).map(bundle =>
-            (this.state.stream[bundle].length > 0 &&
+          {this.state.stream ? this.state.stream.bundles.map(bundle =>
+            (bundle.articles.length > 0 &&
               <NewsBundle
-                key={bundle}
-                bundleName={bundle}
-                bundle={this.state.stream[bundle]} />)
-          ): <Loading />}
+                key={bundle.name}
+                bundleName={bundle.name}
+                bundle={bundle.articles} />)
+          ): <div className='tc moon-gray w-100 pa7 f1 fw9'>Loading</div>}
+          {this.state.stream && this.state.stream.unbundled.map((a,i) => (
+						<NewsArticle key={i} index={i} article={a} />
+          ))}
         </main>
       </div>
     );

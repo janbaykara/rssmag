@@ -11,10 +11,11 @@ Hopefully we can solve [this](https://news.ycombinator.com/item?id=12933006).
 * [X] Bundles multiple stories on specific issues
 ** [X] Focus on unusual words (e.g. by low->high corpus frequency)
 ** [X] Identify similar tags (thesaurus, different forms of same word)
-** [ ] Remove bundles with only 1 article
+** [X] Remove bundles with only 1 article
 ** [ ] Get reliable article URL from Feedly
 ** [X] Article snippets cut to 5 sentences
-** [ ] Order bundles by size
+** [X] Order bundles by size
+** [ ] Dedupe article list
 ** [ ] Display unbundled articles better
 ** [ ] Identify specific topics / entities of articles
 ** [ ] Group tags by overlap, develop venn diagram of (near) exclusive article groups => bundle

@@ -16,7 +16,7 @@ export default function CategoriesNav({categories, pickCategory}) {
 							className='link'
 							title={cat.description}>{cat.label}</Link>
 					</span>
-				)) : <div className='tc moon-gray w-100 f3 fw9'>LOADING</div>
+				)) : <div className='tc moon-gray w-100 f3 fw9'>Loading categories</div>
 				}
 		</header>
 	)

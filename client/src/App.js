@@ -6,7 +6,7 @@ import {
 } from 'react-router-dom'
 import 'tachyons';
 import CategoriesNav from './components/CategoriesNav'
-import BundleView from './components/BundleView'
+import CategoryView from './components/CategoryView'
 
 export default class App extends Component {
   constructor({match}) {
@@ -36,7 +36,7 @@ export default class App extends Component {
             <Redirect to={'/'+defaultCategoryId} />
           )} />
           <Route path='/:categoryId' render={(...args) => (
-            <BundleView categories={this.state.categories} {...args} />
+            <CategoryView categories={this.state.categories} {...args} />
           )} />
         </div>
       </Router>

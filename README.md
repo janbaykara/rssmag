@@ -15,13 +15,13 @@ Hopefully we can solve [this](https://news.ycombinator.com/item?id=12933006).
 ** [X] Get reliable article URL from Feedly
 ** [X] Article snippets cut to 5 sentences
 ** [X] Order bundles by size
-** [ ] React Router for category IDs
+** [X] React Router for category IDs
 ** [ ] Dedupe article list
 ** [X] Display unbundled articles better
 ** [ ] Identify specific topics / entities of articles
 ** [ ] Group tags by overlap, develop venn diagram of (near) exclusive article groups => bundle
 * [X] Responsive magazine layout for stories
-** [ ] Category-wide visual hierarchy
+** [X] Category-wide visual hierarchy
 ** [ ] Guardian-style horizontal/vertical blocks
 
 ###### Methods / tools

@@ -13,8 +13,8 @@ export default class NewsArticle extends Component {
       <div>
 				<article className={articleClasses}>
 					<a href={article.url} className='db link dim pointer bg-near-white black-80'>
-						{(index === 0 && article.engagementRate > 1 && article.visual) && (
-							<div className='cover w-100 h5 cover bg-black-10 mb2' style={{backgroundImage: `url(${article.visual.url})`}} />
+						{(index === 0 && article.engagementRate > 1 && article.imageURL) && (
+							<div className='cover w-100 h5 cover bg-black-10 mb2' style={{backgroundImage: `url(${article.imageURL})`}} />
 						)}
 						<div className='pa2'>
 							{(index === 0 && article.engagementRate > 5) ? (

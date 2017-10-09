@@ -272,7 +272,7 @@ export default function bundleArticles(articles, options = {}) {
 			engagementRate: Number(article.engagementRate || 0),
 			assignedBundle: article.assignedBundle,
 			summary: article.summary ? formatSummary(article.summary.content) : article.content ? formatSummary(article.content.content) : null,
-			visual: article.visual,
+			imageURL: article.visual ? article.visual.url : null,
 			url: article.alternate[0].href
 		}
 	}

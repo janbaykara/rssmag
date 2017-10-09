@@ -24,6 +24,8 @@
     "koa-router": "^7.2.1",
     "koa-static": "^4.0.1",
     "node-json-db": "^0.7.3",
+    "react-router": "^4.2.0",
+    "react-router-dom": "^4.2.2",
     "subtlex-word-frequencies": "^1.0.0",
     "synonyms": "^1.0.1"
   },

@@ -1,19 +1,22 @@
 import React, { Component } from 'react';
+import {
+  BrowserRouter as Router,
+	Redirect,
+  Route
+} from 'react-router-dom'
 import 'tachyons';
 import CategoriesNav from './components/CategoriesNav'
 import BundleView from './components/BundleView'
 
-class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { }
+export default class App extends Component {
+  constructor({match}) {
+		console.log()
+		super()
+		this.state = {}
   }
 
   componentDidMount() {
-  	const streamId = 'user/3a94abfc-0869-47f0-9e7c-892608dd551c/category/Political Comment'; // Political Comment
-  	// const streamId = 'user/3a94abfc-0869-47f0-9e7c-892608dd551c/category/World News' // World News
-    this.fetchCategories();
-    this.fetchStream(streamId);
+    this.fetchCategories()
   }
 
   fetchCategories = () => {
@@ -23,22 +26,20 @@ class App extends Component {
     .catch(console.log)
   }
 
-  fetchStream = (streamId) => {
-    this.setState({stream: null})
-    return fetch(`http://localhost:3000/api/bundle/${encodeURIComponent(streamId)}/100`)
-    .then(x => x.json())
-    .then(x => this.setState({stream: x}))
-    .catch(console.log)
-  }
-
-  render() {
+  render = () => {
+    let defaultCategoryId = encodeURIComponent('user/3a94abfc-0869-47f0-9e7c-892608dd551c/category/Political Comment')
     return (
-      <div>
-        <CategoriesNav categories={this.state.categories} fetchStream={this.fetchStream} />
-        <BundleView stream={this.state.stream} />
-      </div>
-    );
+      <Router>
+        <div>
+          <CategoriesNav categories={this.state.categories} />
+          <Route exact path='/' render={() => (
+            <Redirect to={'/'+defaultCategoryId} />
+          )} />
+          <Route path='/:categoryId' render={(...args) => (
+            <BundleView categories={this.state.categories} {...args} />
+          )} />
+        </div>
+      </Router>
+    )
   }
 }
-
-export default App;

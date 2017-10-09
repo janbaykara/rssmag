@@ -86,18 +86,22 @@ export default function bundleArticles(articles, options = {}) {
 			.fromText(textBlob,
 				opts.TAG_MIN_FREQUENCY_ARTICLE,
 				opts.TAG_MAX_WORDS_ARTICLE)
+
+		// Remove short words
 		article.tagData = article.tagData.filter(t => t.word.length >= opts.TAG_MIN_CHAR_LENGTH)
 
-		// Simplify
+		// Flatten to word array
 		article.tags = article.tagData.map(tag => tag.word)
-		// article.tags = article.tags.concat(article.keywords)
 
-		let articleTags = []
-		article.tags.forEach(t => {
-			articleTags = articleTags.concat(tagArray(t,false))
-		})
-		article.tags = [...new Set(articleTags)]
-		// console.log(article.title,'\n',article.tags)
+		// Include keywords
+		article.tags = article.tags.concat(article.keywords)
+
+		// Remove empty elements
+		article.tags = article.tags.filter(String)
+		article.tags = article.tags.filter(Boolean)
+
+		// Dedupe tags
+		article.tags = [...new Set(article.tags)]
 
 		return article
 	})

@@ -100,6 +100,9 @@ export default function bundleArticles(articles, options = {}) {
 		article.tags = article.tags.filter(String)
 		article.tags = article.tags.filter(Boolean)
 
+		// Delete short strings
+		article.tags = article.tags.filter(t => t.length >= opts.TAG_MIN_CHAR_LENGTH)
+
 		// Dedupe tags
 		article.tags = [...new Set(article.tags)]
 
@@ -134,9 +137,6 @@ export default function bundleArticles(articles, options = {}) {
 
 		categoryTags = [...new Set(categoryTags)]
 	}
-
-	// Delete short strings
-	categoryTags = categoryTags.filter(t => t.length >= opts.TAG_MIN_CHAR_LENGTH)
 
 	// Order least common
 	categoryTags = categoryTags.sort((a,b)=> {

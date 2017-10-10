@@ -13,13 +13,13 @@ export default class CategoryView extends Component {
 	componentWillReceiveProps = (props) => {
 		console.log("New view",props.categories)
 		const categoryId = decodeURIComponent(props[0].match.params.categoryId)
-		this.state = {
+		this.setState({
 			path: props[0].match.path,
 			params: props[0].match.params,
 			stream: null,
 			categoryId: categoryId,
 			categoryLabel: props.categories.length ? props.categories.find(c => c.id === categoryId).label : /category\/(.*)$/ig.exec(categoryId)[1] // Extract name from id string
-		}
+		})
 
 		this.fetchStream(categoryId)
 	}
@@ -41,8 +41,7 @@ export default class CategoryView extends Component {
 						(bundle.articles.length > 0 &&
 							<NewsBundle
 								key={bundle.name}
-								bundleName={bundle.name}
-								bundle={bundle.articles} />)
+								bundle={bundle} />)
 					): <div className='tc moon-gray w-100 pa7 f1 fw9'>Loading articles</div>}
 					{this.state.stream && this.state.stream.unbundled.map((a,i) => (
 						<div key={i} className='w-100 w-50-ns w-25-l pa1 flex flex-column items-stretch'>

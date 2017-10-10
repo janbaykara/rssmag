@@ -244,7 +244,7 @@ export default function bundleArticles(articles, options = {}) {
 	// Order bundles by length +-, avgEngagement +-
 	stream.bundles = Object.keys(stream.bundles).map(k => ({ name: k, articles: stream.bundles[k] }))
 	stream.bundles.forEach(b => {
-		b.aggEngagementRate = b.articles.reduce(x=>x.engagementRate || 0)
+		b.aggEngagementRate = b.articles.reduce((sum,x)=>sum + (x.engagementRate ? parseFloat(x.engagementRate) : 0), 0)
 		b.avgEngagementRate = b.aggEngagementRate / b.articles.length
 	})
 	stream.bundles.sort((a,b) => {

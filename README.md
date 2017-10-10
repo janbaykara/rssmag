@@ -19,12 +19,15 @@ Hopefully we can solve [this](https://news.ycombinator.com/item?id=12933006).
 ** [ ] Dedupe article list
 ** [X] Display unbundled articles better
 ** [ ] Identify specific topics / entities of articles
+*** https://nlp.stanford.edu/software/CRF-NER.shtml
+*** https://github.com/NaturalNode/natural#classifiers
 ** [ ] Group tags by overlap, develop venn diagram of (near) exclusive article groups => bundle
 * [X] Responsive magazine layout for stories
 ** [X] Category-wide visual hierarchy
 ** [ ] Guardian-style horizontal/vertical blocks
 
 ###### Methods / tools
+* https://stackoverflow.com/questions/14574462/news-article-categorization-subject-entity-analysis-via-nlp-preferably-in
 * [leventshein](https://stackoverflow.com/a/42287748/1053937)
 * [natural (NLP)](https://dzone.com/articles/using-natural-nlp-module)
 * [node-svm](http://svmlight.joachims.org/)

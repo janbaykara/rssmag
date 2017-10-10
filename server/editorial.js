@@ -55,6 +55,8 @@ export default function bundleArticles(articles, options = {}) {
 	 * IOT group articles later
 	*/
 
+	console.log("⚽️ Extracting article tags")
+
 	if(opts.CATEGORY_CORPUS) var categoryBlob = ''
 
 	articles.map(article => {
@@ -96,6 +98,8 @@ export default function bundleArticles(articles, options = {}) {
 		// Include keywords
 		article.tags = article.tags.concat(article.keywords)
 
+		// Entities
+
 		// Remove empty elements
 		article.tags = article.tags.filter(String)
 		article.tags = article.tags.filter(Boolean)
@@ -115,6 +119,8 @@ export default function bundleArticles(articles, options = {}) {
 	 * Generate category-level tags
 	 * Using categoryBlob corpus assembled above
 	*/
+	console.log("⚽️ Extracting category-wide tags")
+
 	let categoryTags
 
 	if(opts.CATEGORY_CORPUS) {
@@ -154,7 +160,7 @@ export default function bundleArticles(articles, options = {}) {
 	 * 	or this is no longer possible
 	*/
 
-	console.log(`Extracted ${categoryTags.length} tags.`)
+	console.log(`⚽️ Bundling articles into ${categoryTags.length} tags`)
 
 	let stream = {bundles:{}, unbundled:[]};
 	let retries = {};
@@ -168,7 +174,7 @@ export default function bundleArticles(articles, options = {}) {
 
 			let tagArr = tagArray(tag, true)
 
-			console.log(`${i} / ${arr.length} - ${tag} (${tagArr.length})`)
+			// console.log(`${i} / ${arr.length} - ${tag} (${tagArr.length})`)
 
 			stream.bundles[tag] = stream.bundles[tag] || []
 			articles.forEach(article => {
@@ -200,7 +206,7 @@ export default function bundleArticles(articles, options = {}) {
 		// Remove single-article bundles and try again
 		let deviantBundles = Object.keys(stream.bundles).filter(k => stream.bundles[k].length < opts.BUNDLE_SIZE_MIN || stream.bundles[k].length > opts.BUNDLE_SIZE_MAX);
 		if(deviantBundles.length > 0) {
-			console.log(`😡 Deviant bundles: ${deviantBundles.length}`)
+			console.log(`Attempt ${tryN} - 😡 Deviant bundles: ${deviantBundles.length}`)
 			deviantBundles.forEach(k => {
 				retries[k] = retries[k] ? retries[k] + 1 : 2;
 				// console.log('⛔️ Deleting tag ',k, stream.bundles[k].length);
@@ -233,6 +239,7 @@ export default function bundleArticles(articles, options = {}) {
 	 * TRANSFORM ARTICLES
 	 * Prepare data for UI
 	*/
+	console.log("⚽️ Ordering and formatting")
 
 	Object.keys(stream.bundles).forEach(k => {
 		// Order each bundle by article's engagementRate
@@ -257,7 +264,7 @@ export default function bundleArticles(articles, options = {}) {
 	stream.unbundled = stream.unbundled.map(articleFormatting)
 	stream.unbundled.sort((a,b) => (b.engagementRate || 0) - (a.engagementRate || 0));
 
-	// console.log(stream)
+	console.log('⚽️ Done!')
 
 	return stream;
 

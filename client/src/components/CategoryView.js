@@ -6,19 +6,21 @@ import NewsArticle from './NewsArticle';
 export default class CategoryView extends Component {
 	constructor(props) {
 		super(props)
-		this.state = {}
+		this.state = { initiated: false }
 	}
 
 	// On router new category
-	componentWillReceiveProps = (props) => {
-		console.log("New view",props.categories)
-		const categoryId = decodeURIComponent(props[0].match.params.categoryId)
+	componentWillReceiveProps = (nextProps) => {
+		if(this.state.initiated && this.props[0].match.params.categoryId === nextProps[0].match.params.categoryId) return false;
+
+		const categoryId = decodeURIComponent(nextProps[0].match.params.categoryId)
 		this.setState({
-			path: props[0].match.path,
-			params: props[0].match.params,
+			initiated: true,
+			path: nextProps[0].match.path,
+			params: nextProps[0].match.params,
 			stream: null,
 			categoryId: categoryId,
-			categoryLabel: props.categories.length ? props.categories.find(c => c.id === categoryId).label : /category\/(.*)$/ig.exec(categoryId)[1] // Extract name from id string
+			categoryLabel: nextProps.categories.length ? nextProps.categories.find(c => c.id === categoryId).label : /category\/(.*)$/ig.exec(categoryId)[1] // Extract name from id string
 		})
 
 		this.fetchStream(categoryId)

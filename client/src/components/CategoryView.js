@@ -9,18 +9,31 @@ export default class CategoryView extends Component {
 		this.state = { initiated: false }
 	}
 
-	// On router new category
-	componentWillReceiveProps = (nextProps) => {
-		if(this.state.initiated && this.props[0].match.params.categoryId === nextProps[0].match.params.categoryId) return false;
+	componentWillMount() {
+		this.loadData()
+	}
 
-		const categoryId = decodeURIComponent(nextProps[0].match.params.categoryId)
+	componentWillUpdate() {
+		this.loadData()
+	}
+
+	shouldComponentUpdate = (nextProps, nextState) => {
+		if(!this.state.initiated
+			|| this.props[0].match.params.categoryId !== nextProps[0].match.params.categoryId
+			|| this.props[0].categories === null ) {
+			return true
+		} else {
+			return false;
+		}
+	}
+
+	loadData = () => {
+		const categoryId = decodeURIComponent(this.props[0].match.params.categoryId)
 		this.setState({
 			initiated: true,
-			path: nextProps[0].match.path,
-			params: nextProps[0].match.params,
 			stream: null,
 			categoryId: categoryId,
-			categoryLabel: nextProps.categories.length ? nextProps.categories.find(c => c.id === categoryId).label : /category\/(.*)$/ig.exec(categoryId)[1] // Extract name from id string
+			categoryLabel: this.props.categories && this.props.categories.length > 0 ? this.props.categories.find(c => c.id === categoryId).label : /category\/(.*)$/ig.exec(categoryId)[1] // Extract name from id string
 		})
 
 		this.fetchStream(categoryId)

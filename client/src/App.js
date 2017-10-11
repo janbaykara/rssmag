@@ -55,7 +55,9 @@ export default class App extends Component {
             <div className='i'>Categories</div>
           </UnselectableHeader>
           <Route path='/:categoryId' render={(...args) => (
-            <main className='w-100 w-80-ns center'><CategoryView categories={this.state.categories} {...args} /></main>
+            <main className='w-100 w-80-ns center'>
+              <CategoryView categories={this.state.categories} {...args} />
+            </main>
           )} />
         </div>
       </Router>

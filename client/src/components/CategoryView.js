@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import 'tachyons';
 import NewsBundle from './NewsBundle';
 import NewsArticle from './NewsArticle';
-import diff from 'deep-diff'
+import diff from 'deep-diff';
 
 export default class CategoryView extends Component {
 	constructor(props) {

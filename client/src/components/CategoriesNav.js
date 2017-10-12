@@ -1,78 +1,63 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { Link } from 'react-router-dom'
 import styled from 'styled-components';
 import 'tachyons';
-
-const slideDuration = '0.15s';
-
-const ModalBackground = styled.div`
-	&:before {
-		content: '';
-		background: #000000;
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-		z-index: 1;
-		opacity: 0;
-		transition: opacity ${slideDuration} ease;
-		pointer-events: none;
-	}
-
-	.sidebarOpen > &:before {
-		opacity: 0.3;
-		pointer-events: inherit;
-	}
-`;
-
-const Sidebar = styled.div`
-	transition: all ${slideDuration} ease;
-
-	> * { opacity: 1; }
-
-	.sidebarClosed > & > * { opacity: 0.3; }
-
-	.sidebarClosed > & {
-		width: 0;
-		padding-left: 0;
-		padding-right: 0;
-		box-shadow: none;
-	}
-`;
+import diff from 'deep-diff';
 
 const NoOverflowDiv = styled.div`
+	/* No overflow */
 	white-space: nowrap;
 	overflow: hidden;
+
+	/* Fade in-out */
+	transition: opacity 0.2s ease;
+	opacity: 0.5;
+	.sidebarOpen & { opacity: 1 }
 `
 
-const UnselectableHeader = styled(NoOverflowDiv)`
+const UnselectableHeader = styled(NoOverflowDiv).attrs({
+	className: 'pa3 pointer'
+})`
+	/* TODO: Move this to Tachyons extension */
 	user-select: none;
 `
 
-export default function CategoriesNav({categories, isOpen, toggleSidebar}) {
-	return (
-		<nav className={isOpen ? 'sidebarOpen' : 'sidebarClosed'}>
-			<ModalBackground className='pointer' onClick={toggleSidebar} />
-			<Sidebar className='bg-black-90 near-white z-3 fixed top-0 left-0 h-100 w-90 w-40-ns w-20-l h-100 shadow-2 overflow-y-auto'>
+export default class CategoriesNav extends Component {
+	shouldComponentUpdate(nextProps,nextState) {
+		const propDiff = diff(this.props, nextProps)
+		const stateDiff = diff(this.state, nextState)
+		// console.log("PROP",propDiff)
+		// console.log("STATE",stateDiff)
+		if(propDiff !== undefined || stateDiff !== undefined) {
+			// console.log("✅ Updating!")
+			return true;
+		} else {
+			// console.log("❌ Not updating!")
+			return false;
+		}
+	}
+
+	render() {
+		return (
+			<nav className='bg-black-90 near-white fixed top-0 left-0 h-100 w-100 overflow-y-auto'>
 				<UnselectableHeader
-					className='pa3 pointer'
-					onClick={toggleSidebar}>
+					onClick={this.props.toggleSidebar}>
 					<div className='fw9 f3'>RSSMAG</div>
-					<div className='i'>Your Feedly categories</div>
+					<div className='i orange'>Your Feedly categories</div>
 				</UnselectableHeader>
-				{categories ? (<ul className='list pa3'>
-					{categories.map(cat => (
-						<NoOverflowDiv key={cat.id} className='pointer dim mv2'>
-							<Link
-								onClick={toggleSidebar}
-								to={'/'+encodeURIComponent(cat.id)}
-								className='link white fw4 f5 '
-								title={cat.description}>{cat.label}</Link>
-							</NoOverflowDiv>
-						))}
-					</ul>) : <NoOverflowDiv className='moon-gray pa3 w-100 f3 fw9 pv4'>Loading categories</NoOverflowDiv>}
-				</Sidebar>
+				{this.props.categories ? (
+				<ul className='list pa3'>
+				{this.props.categories.map(cat => (
+					<NoOverflowDiv key={cat.id} className='pointer mv2 pt1'>
+						<Link
+							onClick={this.props.toggleSidebar}
+							to={'/'+encodeURIComponent(cat.id)}
+							className='link white fw4 f5 dim'
+							title={cat.description}>{cat.label}</Link>
+						</NoOverflowDiv>
+					))}
+				</ul>) : <NoOverflowDiv className='moon-gray pa3 w-100 f3 fw9 pv4'>Loading categories</NoOverflowDiv>}
 			</nav>
 		)
 	}
+}

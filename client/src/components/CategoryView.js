@@ -48,18 +48,18 @@ export default class CategoryView extends Component {
 
 	render = () => {
 		const categoryId = decodeURIComponent(this.props.categoryId)
-		const categoryLabel = this.props.categories && this.props.categories.length > 0 ? this.props.categories.find(c => c.id === categoryId).label : /category\/(.*)$/ig.exec(categoryId)[1] // Extract name from id string
+		const categoryLabel = this.props.categories && this.props.categories.length > 0 ? this.props.categories.find(c => c.id === categoryId).label : idToName(categoryId) // Extract name from id string
 
 		return [
 			<header key='header' className='f1 fw3 mv4 tc'>{categoryLabel}</header>,
 			<div key='body' className='flex flex-wrap items-start items-stretch pa3 pt0'>
-				{this.state.stream ? this.state.stream.bundles.map(bundle =>
+				{this.state.stream ? this.state.stream.articles.bundles.map(bundle =>
 					(bundle.articles.length > 0 &&
 						<NewsBundle
 							key={bundle.name}
 							bundle={bundle} />)
 				): <div className='tc moon-gray w-100 pa3 pa7-l f1 fw9'>Loading articles</div>}
-				{this.state.stream && this.state.stream.unbundled.map((a,i) => (
+				{this.state.stream && this.state.stream.articles.unbundled.map((a,i) => (
 					<div key={i} className='w-100 w-50-ns w-25-l pa1 flex flex-column items-stretch'>
 						<NewsArticle index={i} article={a} />
 					</div>
@@ -67,4 +67,9 @@ export default class CategoryView extends Component {
 			</div>
 		]
 	}
+}
+
+function idToName(id) {
+	var matches = /category\/(.*)$/ig.exec(id)
+	return matches ? matches[1] : null
 }

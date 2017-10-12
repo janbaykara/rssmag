@@ -24,32 +24,30 @@ const api = axios.create({
 	}).adapter
 })
 
-function getEntries(streamId, requiredArticleN) {
+function getStream(streamId, requiredArticleN) {
 	return new Promise((resolve, reject) => {
-		let articleData = []
-		let continuation = ''
+		let articles = [];
+		let continuation = '';
 
-		fetch()
-
-		function fetch() {
-			return api
+		(function fetch() {
+			api
 			.get(`streams/${encodeURIComponent(streamId)}/contents${continuation}`)
 			.catch((e)=>reject(e))
 			.then(res => {
-				console.log(`🎃 API access number __${res.headers['x-ratelimit-count']}__ - ${res.request.fromCache ? 'CACHED' : 'new data'}`)
+				console.log(`🎃 API access number __${res.headers['x-ratelimit-count']}__ - ${res.request.fromCache ? 'CACHED' : 'new data'}`);
 				// console.log("🤢 contents/?continuation="+continuation, res.data.items.length)
-				articleData = articleData.concat(res.data.items)
-				if(articleData.length >= requiredArticleN || !res.data.continuation) {
-					console.log("😈 ARTICLEDATA acquired, no. of articles: ",articleData.length)
-					return resolve(articleData)
+				articles = articles.concat(res.data.items);
+				if(articles.length >= requiredArticleN || !res.data.continuation) {
+					console.log("😈 ARTICLEDATA acquired, no. of articles: ",articles.length);
+					return resolve(articles)
 				} else if(res.data.continuation) {
-					continuation = `?continuation=${res.data.continuation}`
+					continuation = `?continuation=${res.data.continuation}`;
 					// console.log("Next continuation stream: ",res.data.continuation)
-					return fetch()
+					return fetch();
 				}
-			})
-		}
-	})
+			});
+		})();
+	});
 }
 
-export default { api, getEntries }
+export default { api, getStream }

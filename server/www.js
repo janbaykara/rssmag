@@ -27,8 +27,11 @@ router.get('/api/feedly/:endpoint', async (ctx, next) => {
 router.get('/api/bundle/:streamId/:n', async (ctx, next) => {
 	await next()
 	try {
-		let articleData = await Feedly.getEntries(ctx.params.streamId, ctx.params.n)
-		ctx.body = bundleArticles(articleData)
+		let streamArticles = await Feedly.getStream(ctx.params.streamId, ctx.params.n)
+		ctx.body = {
+			id: ctx.params.streamId,
+			articles: await bundleArticles(streamArticles)
+		}
 	} catch(e) {
 		console.log(e)
 	}

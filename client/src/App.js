@@ -27,7 +27,8 @@ export default class App extends Component {
   }
 
   fetchCategories = () => {
-    return fetch(`http://localhost:3000/api/feedly/categories`)
+    console.log("Loading categories")
+    return fetch(`/api/feedly/categories`)
     .then(x => x.json())
     .then(x => this.setState({categories: x}))
     .catch(console.log)

@@ -51,14 +51,16 @@ export default class App extends Component {
             isOpen={this.state.isSidebarOpen}
             toggleSidebar={this.toggleSidebar}
           />
-          <UnselectableHeader onClick={this.toggleSidebar} className='w-100 w-10-l center ml0-l tc tl-l pa3 pointer'>
-            <div className='fw9 f3'>RSSMAG</div>
-            <div className='i'>Categories</div>
-          </UnselectableHeader>
           <Route path='/:categoryId' render={(props) => (
-            <main className='w-100 w-80-ns center'>
-              <CategoryView categories={this.state.categories} categoryId={props.match.params.categoryId} />
-            </main>
+            <div className='flex-l'>
+              <UnselectableHeader onClick={this.toggleSidebar} className='w-100 w-10-l center ma0-l tc tl-l pa3 pointer'>
+                <div className='fw9 f3'>RSSMAG</div>
+                <div className='i'>Categories</div>
+              </UnselectableHeader>
+              <main className='w-100 w-80-l center ma0-l'>
+                <CategoryView categories={this.state.categories} categoryId={props.match.params.categoryId} />
+              </main>
+            </div>
           )} />
         </div>
       </Router>

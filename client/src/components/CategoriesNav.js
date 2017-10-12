@@ -61,13 +61,13 @@ export default function CategoriesNav({categories, isOpen, toggleSidebar}) {
 					<div className='fw9 f3'>RSSMAG</div>
 					<div className='i'>Your Feedly categories</div>
 				</UnselectableHeader>
-				{categories ? (<ul class='list pa3'>
+				{categories ? (<ul className='list pa3'>
 					{categories.map(cat => (
 						<NoOverflowDiv key={cat.id} className='pointer dim mv2'>
 							<Link
 								onClick={toggleSidebar}
 								to={'/'+encodeURIComponent(cat.id)}
-								className='link black-70 fw4 f5 '
+								className='link white fw4 f5 '
 								title={cat.description}>{cat.label}</Link>
 							</NoOverflowDiv>
 						))}

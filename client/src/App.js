@@ -54,9 +54,9 @@ export default class App extends Component {
             <div className='fw9 f3'>RSSMAG</div>
             <div className='i'>Categories</div>
           </UnselectableHeader>
-          <Route path='/:categoryId' render={(...args) => (
+          <Route path='/:categoryId' render={(props) => (
             <main className='w-100 w-80-ns center'>
-              <CategoryView categories={this.state.categories} {...args} />
+              <CategoryView categories={this.state.categories} categoryId={props.match.params.categoryId} />
             </main>
           )} />
         </div>

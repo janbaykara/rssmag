@@ -16,6 +16,7 @@
     "auto-tagger": "^1.0.5",
     "axios": "^0.16.2",
     "axios-cache-adapter-node": "1.5.7",
+    "deep-diff": "^0.3.8",
     "dotenv": "^4.0.0",
     "html-to-text": "^3.3.0",
     "koa": "^2.3.0",

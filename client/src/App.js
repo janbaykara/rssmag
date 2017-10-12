@@ -16,6 +16,7 @@ const Logo = styled.header.attrs({
   transition: opacity 0.2s ease;
   opacity: 1;
   .sidebarOpen & { opacity: 0.2 }
+  .sidebarOpen & .thenHide { opacity: 0 }
 `
 
 const SlideRevealWindow = styled.div.attrs({
@@ -24,7 +25,7 @@ const SlideRevealWindow = styled.div.attrs({
   width: 100vw;
   height: 100vh;
   overflow: auto;
-  transition: left 0.2s ease;
+  transition: left 0.3s ease;
   left: 0%;
 
   .sidebarOpen & {
@@ -78,8 +79,8 @@ export default class App extends Component {
           <Route path='/:categoryId' render={(props) => (
             <SlideRevealWindow onClick={this.state.isSidebarOpen ? this.toggleSidebar : null}>
               <Logo onClick={this.toggleSidebar}>
-                <div className='fw9 f3'>RSSMAG</div>
-                <div className='i'>Categories</div>
+                <span className='fw9 f3'>{this.state.isSidebarOpen ? '✖︎' : '☰'}&nbsp;</span>
+                <span className='fw9 f3 thenHide'>RSSMAG</span>
               </Logo>
               <main className='w-100 w-80-l center ma0-l'>
                 <CategoryView categories={this.state.categories} categoryId={props.match.params.categoryId} />

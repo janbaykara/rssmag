@@ -90,8 +90,9 @@ function idToName(id,type) {
 		case 'category':
 			var matches = /category\/(.*)$/ig.exec(id);
 			return matches ? matches[1] : null;
-			break;
 		case 'topic':
 			return `Topic: ${id}`;
+		default:
+			return '';
 	}
 }

@@ -42,7 +42,7 @@ export default function bundleArticles(articles, options = {}) {
 			BUNDLE_SIZE_MAX: 7,
 			//
 			EXCLUSIVE_BUNDLES_BOOL: true,
-			CATEGORY_CORPUS: false,
+			CATEGORY_CORPUS: true,
 			//
 			SNIPPET_MIN_LENGTH: 100,
 			SNIPPET_MAX_LENGTH: 350,
@@ -121,7 +121,7 @@ export default function bundleArticles(articles, options = {}) {
 			// Include keywords
 			article.tags = article.tags.concat(article.keywords);
 
-			// Entities
+			// TODO: Entities
 
 			// Remove empty elements
 			article.tags = article.tags.filter(String);
@@ -133,9 +133,10 @@ export default function bundleArticles(articles, options = {}) {
 			// Dedupe tags
 			article.tags = [...new Set(article.tags)];
 
+			categoryTags = categoryTags.concat(article.tags);
+
 			return article;
 		})
-
 
 		/**
 		 * CATEGORY TAGGING
@@ -144,28 +145,19 @@ export default function bundleArticles(articles, options = {}) {
 		*/
 		console.log("⚽️ Extracting category-wide tags")
 
-		let categoryTags;
-
 		if(opts.CATEGORY_CORPUS) {
-			// Either create new, high-level tags
-			// 	from a category corpus tags
-			categoryTags = tagger
+			// Create new, high-level tags from a category corpus tags
+			let corpusTags = tagger
 				.fromText(categoryBlob,
 					opts.TAG_MIN_FREQUENCY_CATEGORY,
 					opts.TAG_MAX_WORDS_CATEGORY);
 
 			// Simplify
-			categoryTags = categoryTags.map(t => t.word);
-		} else {
-			// Or aggregate article-level tags
-			categoryTags = [];
-
-			articles.forEach(a => {
-				categoryTags = categoryTags.concat(a.tags);
-			});
-
-			categoryTags = [...new Set(categoryTags)];
+			corpusTags = corpusTags.map(t => t.word);
+			categoryTags = categoryTags.concat(corpusTags)
 		}
+
+		categoryTags = [...new Set(categoryTags)];
 
 		// Order least common
 		categoryTags = categoryTags.sort((a,b)=> {

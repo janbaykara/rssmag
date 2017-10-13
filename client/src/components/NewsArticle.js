@@ -18,11 +18,11 @@ export default class NewsArticle extends Component {
 						)}
 						<div className='pa2'>
 							{(index === 0 && article.engagementRate > 5) ? (
-								<div className='fw9 f1 mb2'><span className='orange'>{article.engagementRate}</span> {article.title}</div>
+								<div className='fw9 f2 mb2'><span className='orange'>{article.engagementRate}</span> {article.title}</div>
 							)
 							:
 							(index === 0 && article.engagementRate > 1) ? (
-								<div className='fw4 f2 mb2'><span className='orange'>{article.engagementRate}</span> {article.title}</div>
+								<div className='fw4 f3 mb2'><span className='orange'>{article.engagementRate}</span> {article.title}</div>
 							)
 							:
 							(index > 0 && article.engagementRate > 1) ? (

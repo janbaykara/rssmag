@@ -11,7 +11,7 @@ import CategoriesNav from './components/CategoriesNav'
 import StreamView from './components/StreamView'
 
 const Logo = styled.header.attrs({
-  className: 'w-100 w-10-l center ma0-l tc tl-l pa3 pointer'
+  className: 'w-100 w-10-l center ma0-l tl-l pa3 pointer'
 })`
   user-select: none;
   transition: opacity 0.2s ease;

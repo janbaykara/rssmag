@@ -56,9 +56,31 @@ export default function bundleArticles(articles, options = {}) {
 		 * IOT group articles later
 		*/
 
-		console.log("⚽️ Extracting article tags")
-
 		if(opts.CATEGORY_CORPUS) var categoryBlob = '';
+
+		// Dedupe articles
+		// TODO: Maybe dedupe by url? newA.alternate[0].href
+		let titleHash = {};
+		articles.forEach(newA => {
+			if(titleHash[newA.title]) {
+				let extantA = titleHash[newA.title]
+				let extantEngagement = Number(extantA.engagementRate || 0)
+				let newEngagement = Number(newA.engagementRate || 0)
+
+				if(newEngagement > extantEngagement || newA.origin.title.length < extantA.origin.title.length) {
+					titleHash[newA.title] = newA;
+				}
+			} else {
+				titleHash[newA.title] = newA;
+			}
+		});
+		articles = Object.values(titleHash);
+
+		console.log(`⚽️ Deduped articles: ${articles.length}`)
+
+		let categoryTags = [];
+
+		console.log("⚽️ Extracting article tags")
 
 		articles.map(article => {
 			// Ignore news source name

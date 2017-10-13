@@ -23,15 +23,31 @@ router.get('/api/feedly/:endpoint', async (ctx, next) => {
 	}
 })
 
-// e.g. http://localhost:3000/api/bundle/user%2F3a94abfc-0869-47f0-9e7c-892608dd551c%2Fcategory%2FPolitical%20Comment/100
-router.get('/api/bundle/:streamId/:n', async (ctx, next) => {
+router.get('/api/bundle/:n/:mode/articles/:streamId', async (ctx, next) => {
 	await next()
 	try {
-		let streamArticles = await Feedly.getStream(ctx.params.streamId, ctx.params.n)
+		let streamArticles;
+
+		switch(ctx.params.mode) {
+			case 'streamed':
+				streamArticles = await Feedly.getArticles(`streams/${encodeURIComponent(ctx.params.streamId)}/contents`, {}, ctx.params.n)
+				break;
+
+			case 'mixed':
+				streamArticles = await Feedly.getArticles(`mixes/contents`, {
+					streamId: ctx.params.streamId,
+					hours: 24,
+					backfill: true,
+					count: Math.min(20, ctx.params.n)
+				}, ctx.params.n)
+				break;
+		}
+
 		ctx.body = {
-			id: ctx.params.streamId,
+			id: `${ctx.params.method}/${ctx.params.streamId}`,
 			articles: await bundleArticles(streamArticles)
 		}
+
 	} catch(e) {
 		console.log(e)
 	}

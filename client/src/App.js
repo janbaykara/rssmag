@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import {
   BrowserRouter as Router,
+  Switch,
   Redirect,
   Route
 } from 'react-router-dom'
 import styled from 'styled-components';
 import 'tachyons';
 import CategoriesNav from './components/CategoriesNav'
-import CategoryView from './components/CategoryView'
+import StreamView from './components/StreamView'
 
 const Logo = styled.header.attrs({
   className: 'w-100 w-10-l center ma0-l tc tl-l pa3 pointer'
@@ -69,24 +70,28 @@ export default class App extends Component {
     return (
       <Router>
         <div className={this.state.isSidebarOpen ? 'sidebarOpen' : 'sidebarClosed'}>
-          <Route exact path='/' render={() => (
-            <Redirect to={'/'+defaultCategoryId} />
-          )} />
           <CategoriesNav
             categories={this.state.categories}
             toggleSidebar={this.toggleSidebar}
           />
-          <Route path='/:categoryId' render={(props) => (
-            <SlideRevealWindow onClick={this.state.isSidebarOpen ? this.toggleSidebar : null}>
-              <Logo onClick={this.toggleSidebar}>
-                <span className='fw9 f3'>{this.state.isSidebarOpen ? '✖︎' : '☰'}&nbsp;</span>
-                <span className='fw9 f3 thenHide'>RSSMAG</span>
-              </Logo>
-              <main className='w-100 w-80-l center ma0-l'>
-                <CategoryView categories={this.state.categories} categoryId={props.match.params.categoryId} />
-              </main>
-            </SlideRevealWindow>
-          )} />
+          <Switch>
+            <Route path='/:type/:streamId' render={(props) => (
+              <SlideRevealWindow onClick={this.state.isSidebarOpen ? this.toggleSidebar : null}>
+                <Logo onClick={this.toggleSidebar}>
+                  <span className='fw9 f3'>{this.state.isSidebarOpen ? '✖︎' : '☰'}&nbsp;</span>
+                  <span className='fw9 f3 thenHide'>RSSMAG</span>
+                </Logo>
+                <main className='w-100 w-80-l center ma0-l'>
+                  <StreamView
+                    categories={this.state.categories}
+                    type={props.match.params.type}
+                    streamId={decodeURIComponent(props.match.params.streamId)}
+                  />
+                </main>
+              </SlideRevealWindow>
+            )} />
+            <Redirect to={'/category/'+defaultCategoryId} />
+          </Switch>
         </div>
       </Router>
     )

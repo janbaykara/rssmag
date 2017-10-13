@@ -1,9 +1,10 @@
-import dotenv from 'dotenv'
-import axios from 'axios'
-import { setupCache } from 'axios-cache-adapter-node'
-import nodeJsonDriver from './nodeJsonDriver'
+import { URLSearchParams } from 'url';
+import dotenv from 'dotenv';
+import axios from 'axios';
+import { setupCache } from 'axios-cache-adapter-node';
+import nodeJsonDriver from './nodeJsonDriver';
 
-dotenv.config()
+dotenv.config();
 
 // 1. Feedly OAuth2
 // - Using dev token for now
@@ -22,32 +23,35 @@ const api = axios.create({
       query: false
     }
 	}).adapter
-})
+});
 
-function getStream(streamId, requiredArticleN) {
+
+//.get(`mixes/contents?hours=24&backfill=true&count=20&streamId=${encodeURIComponent(streamId)}/contents${continuation}`)
+//.get(`streams/${encodeURIComponent(streamId)}/contents${continuation}`)
+function getArticles(path, options, requiredArticleN) {
+	let articles = [];
+
 	return new Promise((resolve, reject) => {
-		let articles = [];
-		let continuation = '';
-
 		(function fetch() {
+			let params = new URLSearchParams(options);
+			let url = `${path}?${params.toString()}`;
+
 			api
-			.get(`streams/${encodeURIComponent(streamId)}/contents${continuation}`)
+			.get(`${url}`)
 			.catch((e)=>reject(e))
 			.then(res => {
 				console.log(`🎃 API access number __${res.headers['x-ratelimit-count']}__ - ${res.request.fromCache ? 'CACHED' : 'new data'}`);
-				// console.log("🤢 contents/?continuation="+continuation, res.data.items.length)
 				articles = articles.concat(res.data.items);
-				if(articles.length >= requiredArticleN || !res.data.continuation) {
+				if(articles.length < requiredArticleN && res.data.continuation) {
+					options.continuation = res.data.continuation;
+					return fetch();
+				} else {
 					console.log("😈 ARTICLEDATA acquired, no. of articles: ",articles.length);
 					return resolve(articles)
-				} else if(res.data.continuation) {
-					continuation = `?continuation=${res.data.continuation}`;
-					// console.log("Next continuation stream: ",res.data.continuation)
-					return fetch();
 				}
 			});
 		})();
 	});
 }
 
-export default { api, getStream }
+export default { api, getArticles }

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import 'tachyons';
 import diff from 'deep-diff';
@@ -51,7 +51,7 @@ export default class CategoriesNav extends Component {
 					<NoOverflowDiv key={cat.id} className='pointer mv2 pt1'>
 						<Link
 							onClick={this.props.toggleSidebar}
-							to={'/'+encodeURIComponent(cat.id)}
+							to={'/category/'+encodeURIComponent(cat.id)}
 							className='link white fw4 f5 dim'
 							title={cat.description}>{cat.label}</Link>
 						</NoOverflowDiv>

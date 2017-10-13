@@ -28,7 +28,7 @@ const api = axios.create({
 
 //.get(`mixes/contents?hours=24&backfill=true&count=20&streamId=${encodeURIComponent(streamId)}/contents${continuation}`)
 //.get(`streams/${encodeURIComponent(streamId)}/contents${continuation}`)
-function getArticles(path, options, requiredArticleN) {
+function getArticles(path, options, requiredArticleN, addProgress) {
 	let articles = [];
 
 	return new Promise((resolve, reject) => {
@@ -40,13 +40,13 @@ function getArticles(path, options, requiredArticleN) {
 			.get(`${url}`)
 			.catch((e)=>reject(e))
 			.then(res => {
-				console.log(`🎃 API access number __${res.headers['x-ratelimit-count']}__ - ${res.request.fromCache ? 'CACHED' : 'new data'}`);
+				addProgress((articles.length/requiredArticleN), `🎃 API access number __${res.headers['x-ratelimit-count']}__ - ${res.request.fromCache ? 'CACHED' : 'new data'}`);
 				articles = articles.concat(res.data.items);
 				if(articles.length < requiredArticleN && res.data.continuation) {
 					options.continuation = res.data.continuation;
 					return fetch();
 				} else {
-					console.log("😈 ARTICLEDATA acquired, no. of articles: ",articles.length);
+					addProgress(0, "😈 ARTICLEDATA acquired, no. of articles: ",articles.length);
 					return resolve(articles)
 				}
 			});

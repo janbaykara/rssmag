@@ -27,7 +27,7 @@ const tagger = autoTagger
  * @param {Object} options
  * @returns {Object} Entries grouped by topic
 */
-export default function bundleArticles(articles, options = {}) {
+export default function bundleArticles(articles, options = {}, addProgress) {
 	return new Promise((resolve) => {
 		const opts = Object.assign({},{
 			TAG_MIN_FREQUENCY_ARTICLE: 2,
@@ -48,19 +48,18 @@ export default function bundleArticles(articles, options = {}) {
 			SNIPPET_MAX_LENGTH: 350,
 		}, options);
 
-		console.log(`Bundling ${articles.length} articles`);
-
 		/**
 		 * ARTICLE TAGGING
 		 * Generate structured thematic definition
 		 * IOT group articles later
 		*/
 
-		console.log("⚽️ Extracting article tags")
+		addProgress(0, `⚽️ Extracting article tags from ${articles.length} articles`);
 
 		if(opts.CATEGORY_CORPUS) var categoryBlob = ''
+		articles.map((article,i) => {
+			if(i%20 === 0) addProgress(0.3*(i/articles.length), `Tagged ${article.title}`);
 
-		articles.map(article => {
 			// Ignore news source name
 			// TODO: Ignore domain name (cnn in www.cnn.org)
 			tagger.useStopWords([article.author])
@@ -120,7 +119,7 @@ export default function bundleArticles(articles, options = {}) {
 		 * Generate category-level tags
 		 * Using categoryBlob corpus assembled above
 		*/
-		console.log("⚽️ Extracting category-wide tags")
+		addProgress(0, "⚽️ Extracting category-wide tags");
 
 		let categoryTags
 
@@ -138,8 +137,9 @@ export default function bundleArticles(articles, options = {}) {
 			// Or aggregate article-level tags
 			categoryTags = []
 
-			articles.forEach(a => {
 				categoryTags = categoryTags.concat(a.tags)
+			articles.forEach((a,i) => {
+				if(i%20 === 0) addProgress(0.3*(i/articles.length), `Extracted from ${a.title}`);
 			})
 
 			categoryTags = [...new Set(categoryTags)]
@@ -161,14 +161,14 @@ export default function bundleArticles(articles, options = {}) {
 		 * 	or this is no longer possible
 		*/
 
-		console.log(`⚽️ Bundling articles into ${categoryTags.length} tags`)
+		addProgress(0, `⚽️ Bundling articles into ${categoryTags.length} tags`);
 
 		let stream = {bundles:{}, unbundled:[]};
 		let retries = {};
 		let tryN = 1;
 
 		(function assignArticlesToBundles() {
-			// console.log(`🐝 BUNDLING ATTEMPT ${tryN}`)
+			// addProgress(0.6, `🐝 BUNDLING ATTEMPT ${tryN}`)
 
 			categoryTags.forEach((tag,i,arr) => {
 				if(i > (arr.length * opts.TAG_NOVELTY_PERCENT)) return false
@@ -187,17 +187,17 @@ export default function bundleArticles(articles, options = {}) {
 						)
 					) {
 						// if(tryN === 1) {
-						// 	console.log(`📩 Bundling in ${tag}: ${article.title}`)
+						// 	addProgress(0.6, `📩 Bundling in ${tag}: ${article.title}`)
 						// } else {
-						// 	console.log(`✴️➡️ Moving to ${tag}: ${article.title}`)
+						// 	addProgress(0.6, `✴️➡️ Moving to ${tag}: ${article.title}`)
 						// }
 						article.assignedBundle = tag
 						stream.bundles[tag].push(article)
 					} else if(article.assignedBundle) {
-						// console.log(`✴️ Article is bundled in ${article.assignedBundle}: ${article.title}`)
-						// console.log(`Article is bundled in ${article.assignedBundle}: ${article.title}`)
+						// addProgress(0.6, `✴️ Article is bundled in ${article.assignedBundle}: ${article.title}`)
+						// addProgress(0.6, `Article is bundled in ${article.assignedBundle}: ${article.title}`)
 					} else {
-						// console.log(`❌ No tags: ${article.title}`)
+						// addProgress(0.6, `❌ No tags: ${article.title}`)
 					}
 				})
 			});
@@ -207,14 +207,14 @@ export default function bundleArticles(articles, options = {}) {
 			// Remove single-article bundles and try again
 			let deviantBundles = Object.keys(stream.bundles).filter(k => stream.bundles[k].length < opts.BUNDLE_SIZE_MIN || stream.bundles[k].length > opts.BUNDLE_SIZE_MAX);
 			if(deviantBundles.length > 0) {
-				console.log(`Attempt ${tryN} - 😡 Deviant bundles: ${deviantBundles.length}`)
+				// addProgress(0.3*(i/categoryTags.length), `Bundling attempt ${tryN} - 😡 Deviant bundles: ${deviantBundles.length}`)
 				deviantBundles.forEach(k => {
 					retries[k] = retries[k] ? retries[k] + 1 : 2;
-					// console.log('⛔️ Deleting tag ',k, stream.bundles[k].length);
+					// addProgress(0.6, '⛔️ Deleting tag ',k, stream.bundles[k].length);
 					stream.bundles[k].forEach(A => {
-						// console.log("SHOULD have assignedBundle", articles.find(a=>a.title === A.title).assignedBundle)
 						delete A.assignedBundle
-						// console.log("Shouldn't have assignedBundle", articles.find(a=>a.title === A.title).assignedBundle)
+						// addProgress(0.6, "SHOULD have assignedBundle", articles.find(a=>a.title === A.title).assignedBundle)
+						// addProgress(0.6, "Shouldn't have assignedBundle", articles.find(a=>a.title === A.title).assignedBundle)
 					})
 					delete stream.bundles[k];
 					categoryTags.splice(categoryTags.indexOf(k),1);
@@ -231,16 +231,16 @@ export default function bundleArticles(articles, options = {}) {
 		// And the rest
 		stream.unbundled = articles.filter(a => !a.assignedBundle);
 
-		console.log(`\n
+		addProgress(0, `\n
 			🍾🎉🤓 Bundling complete.\n
 			${Object.keys(stream.bundles).length} bundles containing ${articles.length-stream.unbundled.length}/${articles.length} articles.
-			\n`);
+			\n
+			\n⚽️ Ordering and formatting`);
 
 		/**
 		 * TRANSFORM ARTICLES
 		 * Prepare data for UI
 		*/
-		console.log("⚽️ Ordering and formatting")
 
 		Object.keys(stream.bundles).forEach(k => {
 			// Order each bundle by article's engagementRate
@@ -265,7 +265,7 @@ export default function bundleArticles(articles, options = {}) {
 		stream.unbundled = stream.unbundled.map(articleFormatting)
 		stream.unbundled.sort((a,b) => (b.engagementRate || 0) - (a.engagementRate || 0));
 
-		console.log('⚽️ Done!')
+		addProgress(1, '⚽️ Done!');
 
 		return resolve(stream);
 

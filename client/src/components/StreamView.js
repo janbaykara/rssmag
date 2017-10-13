@@ -46,7 +46,7 @@ export default class StreamView extends Component {
 
   fetchCategory = (categoryId) => {
     this.setState({stream: null})
-    return fetch(`/api/bundle/100/streamed/articles/${encodeURIComponent(categoryId)}`)
+    return fetch(`/api/bundle/200/streamed/articles/${encodeURIComponent(categoryId)}`)
     .then(x => x.json())
     .then(x => this.setState({stream: x}))
     .catch(console.log)

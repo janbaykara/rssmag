@@ -10,9 +10,7 @@ import 'tachyons';
 import CategoriesNav from './components/CategoriesNav'
 import StreamView from './components/StreamView'
 
-const Logo = styled.header.attrs({
-  className: 'w-100 w-10-l center ma0-l tl-l pa3 pointer'
-})`
+const Logo = styled.header`
   user-select: none;
   transition: opacity 0.2s ease;
   opacity: 1;
@@ -77,10 +75,12 @@ export default class App extends Component {
           <Switch>
             <Route path='/:type/:streamId' render={(props) => (
               <SlideRevealWindow onClick={this.state.isSidebarOpen ? this.toggleSidebar : null}>
-                <Logo onClick={this.toggleSidebar}>
-                  <span className='fw9 f3'>{this.state.isSidebarOpen ? '✖︎' : '☰'}&nbsp;</span>
-                  <span className='fw9 f3 thenHide'>RSSMAG</span>
-                </Logo>
+                <div className='w-100 w-10-l center ma0-l tl-l'>
+                  <Logo onClick={this.toggleSidebar} className='relative fixed-l pa3 pointer bg-white'>
+                    <span className='fw9 f3'>{this.state.isSidebarOpen ? '✖︎' : '☰'}&nbsp;</span>
+                    <span className='fw9 f3 thenHide'>RSSMAG</span>
+                  </Logo>
+                </div>
                 <main className='w-100 w-80-l center ma0-l'>
                   <StreamView
                     categories={this.state.categories}

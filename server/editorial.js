@@ -175,8 +175,6 @@ export default function bundleArticles(articles, options = {}) {
 
 				let tagArr = tagArray(tag, true);
 
-				if(i%20 === 0) addProgress(0.3*(i/categoryTags.length), `${i} / ${arr.length} - ${tag} (${tagArr.length})`)
-
 				stream.bundles[tag] = stream.bundles[tag] || [];
 				articles.forEach(article => {
 					if(
@@ -212,9 +210,9 @@ export default function bundleArticles(articles, options = {}) {
 					retries[k] = retries[k] ? retries[k] + 1 : 2;
 					// console.log('⛔️ Deleting tag ',k, stream.bundles[k].length);
 					stream.bundles[k].forEach(A => {
-						// addProgress(0.6, "SHOULD have assignedBundle", articles.find(a=>a.title === A.title).assignedBundle)
+						// console.log("SHOULD have assignedBundle", articles.find(a=>a.title === A.title).assignedBundle)
 						A.assignedBundle = undefined;
-						// addProgress(0.6, "Shouldn't have assignedBundle", articles.find(a=>a.title === A.title).assignedBundle)
+						// console.log("Shouldn't have assignedBundle", articles.find(a=>a.title === A.title).assignedBundle)
 					})
 					delete stream.bundles[k];
 					categoryTags.splice(categoryTags.indexOf(k),1);

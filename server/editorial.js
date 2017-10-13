@@ -143,7 +143,7 @@ export default function bundleArticles(articles, options = {}) {
 		 * Generate category-level tags
 		 * Using categoryBlob corpus assembled above
 		*/
-		console.log("⚽️ Extracting category-wide tags")
+		console.log("⚽️ Extracting category corpus tags")
 
 		if(opts.CATEGORY_CORPUS) {
 			// Create new, high-level tags from a category corpus tags
@@ -158,6 +158,8 @@ export default function bundleArticles(articles, options = {}) {
 		}
 
 		categoryTags = [...new Set(categoryTags)];
+
+		console.log("⚽️ Ordering tags by novelty")
 
 		// Order least common
 		categoryTags = categoryTags.sort((a,b)=> {
@@ -245,7 +247,7 @@ export default function bundleArticles(articles, options = {}) {
 
 		console.log(`\n
 			🍾🎉🤓 Bundling complete.\n
-			${Object.keys(stream.bundles).length} bundles containing ${articles.length-stream.unbundled.length}/${articles.length} articles.
+			${Object.keys(stream.bundles).length} bundles containing ${articles.length - stream.unbundled.length}/${articles.length} articles.
 			\n`);
 
 		/**

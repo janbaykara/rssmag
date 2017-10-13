@@ -1,8 +1,8 @@
-import htmlToText from 'html-to-text'
-import autoTagger from 'auto-tagger'
-import corpus from 'subtlex-word-frequencies'
-import synonyms from 'synonyms'
-import URLdiegoPerini from './URLregex'
+import htmlToText from 'html-to-text';
+import autoTagger from 'auto-tagger';
+import corpus from 'subtlex-word-frequencies';
+import synonyms from 'synonyms';
+import URLdiegoPerini from './URLregex';
 
 const tagger = autoTagger
 .useStopWords('en')
@@ -20,7 +20,7 @@ const tagger = autoTagger
 	,'0','1','2','3','4','5','6','7','8','9','10'
 	// Things that should be auto-filtered
 	,'internationalviewpoint', 'cnn', 'bbc', 'order order', 'theguardian', 'times'
-])
+]);
 
 /**
  * @param {Array} articles Feedly entries
@@ -58,7 +58,14 @@ export default function bundleArticles(articles, options = {}) {
 
 		console.log("⚽️ Extracting article tags")
 
+<<<<<<< Updated upstream
 		if(opts.CATEGORY_CORPUS) var categoryBlob = ''
+=======
+		if(opts.CATEGORY_CORPUS) var categoryBlob = '';
+
+		articles.map((article,i) => {
+			if(i%20 === 0) addProgress(0.3*(i/articles.length), `Tagged ${article.title}`);
+>>>>>>> Stashed changes
 
 		articles.map(article => {
 			// Ignore news source name
@@ -71,47 +78,47 @@ export default function bundleArticles(articles, options = {}) {
 				+(
 					// article.content ? article.content.content :
 					article.summary ? article.summary.content : ''
-				)
+				);
 
 			// Remove source name
-			textBlob = textBlob.replace(new RegExp(article.origin.title,'gi'), '')
-			textBlob = textBlob.replace(new RegExp(article.author,'gi'), '')
+			textBlob = textBlob.replace(new RegExp(article.origin.title,'gi'), '');
+			textBlob = textBlob.replace(new RegExp(article.author,'gi'), '');
 
 			// Unformat
-			textBlob = textBlob.toLowerCase()
+			textBlob = textBlob.toLowerCase();
 			textBlob = htmlToText.fromString(textBlob);
 
 			// Add to category corpus
-			if(opts.CATEGORY_CORPUS) categoryBlob += textBlob
+			if(opts.CATEGORY_CORPUS) categoryBlob += textBlob;
 
 			// Get article corpus tags
 			article.tagData = tagger
 				.fromText(textBlob,
 					opts.TAG_MIN_FREQUENCY_ARTICLE,
-					opts.TAG_MAX_WORDS_ARTICLE)
+					opts.TAG_MAX_WORDS_ARTICLE);
 
 			// Remove short words
-			article.tagData = article.tagData.filter(t => t.word.length >= opts.TAG_MIN_CHAR_LENGTH)
+			article.tagData = article.tagData.filter(t => t.word.length >= opts.TAG_MIN_CHAR_LENGTH);
 
 			// Flatten to word array
-			article.tags = article.tagData.map(tag => tag.word)
+			article.tags = article.tagData.map(tag => tag.word);
 
 			// Include keywords
-			article.tags = article.tags.concat(article.keywords)
+			article.tags = article.tags.concat(article.keywords);
 
 			// Entities
 
 			// Remove empty elements
-			article.tags = article.tags.filter(String)
-			article.tags = article.tags.filter(Boolean)
+			article.tags = article.tags.filter(String);
+			article.tags = article.tags.filter(Boolean);
 
 			// Delete short strings
-			article.tags = article.tags.filter(t => t.length >= opts.TAG_MIN_CHAR_LENGTH)
+			article.tags = article.tags.filter(t => t.length >= opts.TAG_MIN_CHAR_LENGTH);
 
 			// Dedupe tags
-			article.tags = [...new Set(article.tags)]
+			article.tags = [...new Set(article.tags)];
 
-			return article
+			return article;
 		})
 
 
@@ -122,7 +129,7 @@ export default function bundleArticles(articles, options = {}) {
 		*/
 		console.log("⚽️ Extracting category-wide tags")
 
-		let categoryTags
+		let categoryTags;
 
 		if(opts.CATEGORY_CORPUS) {
 			// Either create new, high-level tags
@@ -130,28 +137,34 @@ export default function bundleArticles(articles, options = {}) {
 			categoryTags = tagger
 				.fromText(categoryBlob,
 					opts.TAG_MIN_FREQUENCY_CATEGORY,
-					opts.TAG_MAX_WORDS_CATEGORY)
+					opts.TAG_MAX_WORDS_CATEGORY);
 
 			// Simplify
-			categoryTags = categoryTags.map(t => t.word)
+			categoryTags = categoryTags.map(t => t.word);
 		} else {
 			// Or aggregate article-level tags
-			categoryTags = []
+			categoryTags = [];
 
+<<<<<<< Updated upstream
 			articles.forEach(a => {
 				categoryTags = categoryTags.concat(a.tags)
+=======
+			articles.forEach((a,i) => {
+				if(i%20 === 0) addProgress(0.3*(i/articles.length), `Extracted from ${a.title}`);
+				categoryTags = categoryTags.concat(a.tags);
+>>>>>>> Stashed changes
 			})
 
-			categoryTags = [...new Set(categoryTags)]
+			categoryTags = [...new Set(categoryTags)];
 		}
 
 		// Order least common
 		categoryTags = categoryTags.sort((a,b)=> {
-			let aC = corpus.find(C => C.word == a)
-			let aCCount = aC ? aC.count : 0
-			let bC = corpus.find(C => C.word == b)
-			let bCCount = bC ? bC.count : 0
-			return aC - bC
+			let aC = corpus.find(C => C.word == a);
+			let aCCount = aC ? aC.count : 0;
+			let bC = corpus.find(C => C.word == b);
+			let bCCount = bC ? bC.count : 0;
+			return aC - bC;
 		})
 
 		/**
@@ -171,13 +184,13 @@ export default function bundleArticles(articles, options = {}) {
 			// console.log(`🐝 BUNDLING ATTEMPT ${tryN}`)
 
 			categoryTags.forEach((tag,i,arr) => {
-				if(i > (arr.length * opts.TAG_NOVELTY_PERCENT)) return false
+				if(i > (arr.length * opts.TAG_NOVELTY_PERCENT)) return false;
 
-				let tagArr = tagArray(tag, true)
+				let tagArr = tagArray(tag, true);
 
-				// console.log(`${i} / ${arr.length} - ${tag} (${tagArr.length})`)
+				if(i%20 === 0) addProgress(0.3*(i/categoryTags.length), `${i} / ${arr.length} - ${tag} (${tagArr.length})`)
 
-				stream.bundles[tag] = stream.bundles[tag] || []
+				stream.bundles[tag] = stream.bundles[tag] || [];
 				articles.forEach(article => {
 					if(
 						tagArr.some(t => article.tags.includes(t))
@@ -191,8 +204,8 @@ export default function bundleArticles(articles, options = {}) {
 						// } else {
 						// 	console.log(`✴️➡️ Moving to ${tag}: ${article.title}`)
 						// }
-						article.assignedBundle = tag
-						stream.bundles[tag].push(article)
+						article.assignedBundle = tag;
+						stream.bundles[tag].push(article);
 					} else if(article.assignedBundle) {
 						// console.log(`✴️ Article is bundled in ${article.assignedBundle}: ${article.title}`)
 						// console.log(`Article is bundled in ${article.assignedBundle}: ${article.title}`)
@@ -212,9 +225,15 @@ export default function bundleArticles(articles, options = {}) {
 					retries[k] = retries[k] ? retries[k] + 1 : 2;
 					// console.log('⛔️ Deleting tag ',k, stream.bundles[k].length);
 					stream.bundles[k].forEach(A => {
+<<<<<<< Updated upstream
 						// console.log("SHOULD have assignedBundle", articles.find(a=>a.title === A.title).assignedBundle)
 						delete A.assignedBundle
 						// console.log("Shouldn't have assignedBundle", articles.find(a=>a.title === A.title).assignedBundle)
+=======
+						// addProgress(0.6, "SHOULD have assignedBundle", articles.find(a=>a.title === A.title).assignedBundle)
+						A.assignedBundle = undefined;
+						// addProgress(0.6, "Shouldn't have assignedBundle", articles.find(a=>a.title === A.title).assignedBundle)
+>>>>>>> Stashed changes
 					})
 					delete stream.bundles[k];
 					categoryTags.splice(categoryTags.indexOf(k),1);
@@ -223,7 +242,7 @@ export default function bundleArticles(articles, options = {}) {
 				// Don't keep going if the articles have no place else to go
 				let sortedLonelies = Object.keys(retries).map(k => retries[k]).sort((a,b) => b - a);
 				if(sortedLonelies[0] <= sortedLonelies[1] && categoryTags.length > 0) {
-					assignArticlesToBundles()
+					assignArticlesToBundles();
 				}
 			}
 		})();
@@ -244,25 +263,25 @@ export default function bundleArticles(articles, options = {}) {
 
 		Object.keys(stream.bundles).forEach(k => {
 			// Order each bundle by article's engagementRate
-			stream.bundles[k] = stream.bundles[k].sort((a,b)=>(b.engagementRate || 0) - (a.engagementRate || 0))
+			stream.bundles[k] = stream.bundles[k].sort((a,b)=>(b.engagementRate || 0) - (a.engagementRate || 0));
 			// And trim the payload
-			stream.bundles[k] = stream.bundles[k].map(articleFormatting)
+			stream.bundles[k] = stream.bundles[k].map(articleFormatting);
 		})
 
 		// Order bundles by length +-, avgEngagement +-
-		stream.bundles = Object.keys(stream.bundles).map(k => ({ name: k, articles: stream.bundles[k] }))
+		stream.bundles = Object.keys(stream.bundles).map(k => ({ name: k, articles: stream.bundles[k] }));
 		stream.bundles.forEach(b => {
-			b.aggEngagementRate = b.articles.reduce((sum,x)=>sum + (x.engagementRate ? parseFloat(x.engagementRate) : 0), 0)
-			b.avgEngagementRate = b.aggEngagementRate / b.articles.length
+			b.aggEngagementRate = b.articles.reduce((sum,x)=>sum + (x.engagementRate ? parseFloat(x.engagementRate) : 0), 0);
+			b.avgEngagementRate = b.aggEngagementRate / b.articles.length;
 		})
 		stream.bundles.sort((a,b) => {
 			if(b.articles.length === a.articles.length) {
-				return b.avgEngagementRate - a.avgEngagementRate
+				return b.avgEngagementRate - a.avgEngagementRate;
 			}
-			return b.articles.length - a.articles.length
+			return b.articles.length - a.articles.length;
 		})
 
-		stream.unbundled = stream.unbundled.map(articleFormatting)
+		stream.unbundled = stream.unbundled.map(articleFormatting);
 		stream.unbundled.sort((a,b) => (b.engagementRate || 0) - (a.engagementRate || 0));
 
 		console.log('⚽️ Done!')
@@ -290,28 +309,28 @@ export default function bundleArticles(articles, options = {}) {
 		}
 
 		function formatSummary(text, maxlength = opts.SNIPPET_MAX_LENGTH, minlength = opts.SNIPPET_MIN_LENGTH) {
-			text = htmlToText.fromString(text)
-			if(text.length < minlength) return null
-			text = text.substring(0,maxlength)
-			var urlTag = new RegExp('\\[?'+URLdiegoPerini+'\\]?','gi')
-			text = text.replace(urlTag, '')
-			return text
+			text = htmlToText.fromString(text);
+			if(text.length < minlength) return null;
+			text = text.substring(0,maxlength);
+			var urlTag = new RegExp('\\[?'+URLdiegoPerini+'\\]?','gi');
+			text = text.replace(urlTag, '');
+			return text;
 		}
 	})
 }
 
 function tagArray(tag, syns = true) {
-	let tagArr = [tag]
+	let tagArr = [tag];
 	// Search snynoyms of this tag
 	if(syns) {
-		let synons = synonyms(tag,'n')
+		let synons = synonyms(tag,'n');
 		if(synons) {
-			tagArr = tagArr.concat(synons)
+			tagArr = tagArr.concat(synons);
 		}
 	}
 	// Search for this word without trailing s
 	if(tag.charAt(tag.length-1) == 's') {
-		tagArr.push(tag.slice(0,-1))
+		tagArr.push(tag.slice(0,-1));
 	}
-	return tagArr
+	return tagArr;
 }

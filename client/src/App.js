@@ -7,8 +7,8 @@ import {
 } from 'react-router-dom'
 import styled from 'styled-components';
 import 'tachyons';
-import CategoriesNav from './components/CategoriesNav'
-import StreamView from './components/StreamView'
+import CategoriesNav from './components/CategoriesNav';
+import StreamView from './components/StreamView';
 
 const Logo = styled.header`
   user-select: none;

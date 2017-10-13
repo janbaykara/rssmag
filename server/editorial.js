@@ -58,14 +58,7 @@ export default function bundleArticles(articles, options = {}) {
 
 		console.log("⚽️ Extracting article tags")
 
-<<<<<<< Updated upstream
-		if(opts.CATEGORY_CORPUS) var categoryBlob = ''
-=======
 		if(opts.CATEGORY_CORPUS) var categoryBlob = '';
-
-		articles.map((article,i) => {
-			if(i%20 === 0) addProgress(0.3*(i/articles.length), `Tagged ${article.title}`);
->>>>>>> Stashed changes
 
 		articles.map(article => {
 			// Ignore news source name
@@ -145,15 +138,9 @@ export default function bundleArticles(articles, options = {}) {
 			// Or aggregate article-level tags
 			categoryTags = [];
 
-<<<<<<< Updated upstream
 			articles.forEach(a => {
-				categoryTags = categoryTags.concat(a.tags)
-=======
-			articles.forEach((a,i) => {
-				if(i%20 === 0) addProgress(0.3*(i/articles.length), `Extracted from ${a.title}`);
 				categoryTags = categoryTags.concat(a.tags);
->>>>>>> Stashed changes
-			})
+			});
 
 			categoryTags = [...new Set(categoryTags)];
 		}
@@ -225,15 +212,9 @@ export default function bundleArticles(articles, options = {}) {
 					retries[k] = retries[k] ? retries[k] + 1 : 2;
 					// console.log('⛔️ Deleting tag ',k, stream.bundles[k].length);
 					stream.bundles[k].forEach(A => {
-<<<<<<< Updated upstream
-						// console.log("SHOULD have assignedBundle", articles.find(a=>a.title === A.title).assignedBundle)
-						delete A.assignedBundle
-						// console.log("Shouldn't have assignedBundle", articles.find(a=>a.title === A.title).assignedBundle)
-=======
 						// addProgress(0.6, "SHOULD have assignedBundle", articles.find(a=>a.title === A.title).assignedBundle)
 						A.assignedBundle = undefined;
 						// addProgress(0.6, "Shouldn't have assignedBundle", articles.find(a=>a.title === A.title).assignedBundle)
->>>>>>> Stashed changes
 					})
 					delete stream.bundles[k];
 					categoryTags.splice(categoryTags.indexOf(k),1);

@@ -37,27 +37,21 @@ export default class StreamView extends Component {
 	}
 
 	fetchStream = (type, id) => {
+		let url;
+
 		switch(type) {
-			case 'category': this.fetchCategory(id); break;
-			case 'topic': this.fetchTopic(id); break;
+			case 'category': url = `/api/bundle/200/streamed/articles/${encodeURIComponent(id)}`; break;
+			case 'topic': url = `/api/bundle/100/mixed/articles/${encodeURIComponent(`topic/${id}`)}`; break;
 			default: return false;
 		}
+
+    return fetch(url)
+	    .then(x => x.json())
+	    .then(x => this.setState({stream: x}))
+	    .catch(console.log)
 	}
 
-  fetchCategory = (categoryId) => {
-    this.setState({stream: null})
-    return fetch(`/api/bundle/200/streamed/articles/${encodeURIComponent(categoryId)}`)
-    .then(x => x.json())
-    .then(x => this.setState({stream: x}))
-    .catch(console.log)
-  }
 
-  fetchTopic = (topicName) => {
-    this.setState({stream: null})
-    return fetch(`/api/bundle/100/mixed/articles/${encodeURIComponent(`topic/${topicName}`)}`)
-    .then(x => x.json())
-    .then(x => this.setState({stream: x}))
-    .catch(console.log)
   }
 
 	render = () => {

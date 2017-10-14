@@ -243,11 +243,13 @@ export default function bundleArticles(articles, options = {}) {
 		})();
 
 		// And the rest
-		stream.unbundled = articles.filter(a => !a.assignedBundle);
+		stream.bundles.__unbundled = [
+			...articles.filter(a => !a.assignedBundle)
+		];
 
 		console.log(`\n
 			🍾🎉🤓 Bundling complete.\n
-			${Object.keys(stream.bundles).length} bundles containing ${articles.length - stream.unbundled.length}/${articles.length} articles.
+			${Object.keys(stream.bundles).length} bundles containing ${articles.length - stream.bundles.__unbundled.length}/${articles.length} articles.
 			\n`);
 
 		/**
@@ -275,9 +277,6 @@ export default function bundleArticles(articles, options = {}) {
 			}
 			return b.articles.length - a.articles.length;
 		})
-
-		stream.unbundled = stream.unbundled.map(articleFormatting);
-		stream.unbundled.sort((a,b) => (b.engagementRate || 0) - (a.engagementRate || 0));
 
 		console.log('⚽️ Done!')
 

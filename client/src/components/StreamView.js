@@ -67,19 +67,24 @@ export default class StreamView extends Component {
 		return [
 			<header key='header' className='f1 fw3 mv4 tc ttc'>{streamLabel}</header>,
 			<div key='body' className='flex flex-wrap items-start items-stretch pa3 pt0'>
-				{this.state.stream ? this.state.stream.articles.bundles.map(bundle =>
-					(bundle.articles.length > 0 &&
-						<NewsBundle
-							key={bundle.name}
-							bundle={bundle}
-						 	fetchTopic={this.fetchTopic}
-						/>)
-				): <div className='tc moon-gray w-100 pa3 pa7-l f1 fw9'>Loading articles</div>}
-				{this.state.stream && this.state.stream.articles.unbundled.map((a,i) => (
-					<div key={i} className='w-100 w-50-ns w-25-l pa1 flex flex-column items-stretch'>
-						<NewsArticle index={i} article={a} />
-					</div>
-				))}
+				{this.state.stream ? [
+					this.state.stream.articles.bundles.map(bundle => (
+						(bundle.articles.length > 0 && bundle.name !== '__unbundled') && (
+							<NewsBundle
+								column
+								key={bundle.name+bundle.articles.length}
+								bundle={bundle}
+							 	fetchTopic={this.fetchTopic}
+							/>
+						)
+					)),
+					<NewsBundle
+						grid
+						key='unbundled'
+						name={'Also in '+streamLabel}
+						bundle={this.state.stream.articles.bundles.find(b=>b.name === '__unbundled')}
+					/>
+				] : <div className='tc moon-gray w-100 pa3 pa7-l f1 fw9'>Loading articles</div>}
 			</div>
 		]
 	}

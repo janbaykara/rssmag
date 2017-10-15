@@ -5,27 +5,33 @@ import NewsArticle from './NewsArticle'
 
 export default class NewsBundle extends Component {
   render() {
-    let containerClassNames = this.props.column ? 'flex flex-column w-100 w-50-ns w-25-l bg-white' : 'w-100 bg-white';
-    let listClassNames = this.props.column ? 'pa2 flex flex-column' : 'pa1 flex flex-wrap';
-
     return (
-      <section className={containerClassNames} style={{outline: '1px solid #EEE'}}>
-        {this.props.column ? (
+      <section className='h-100 bg-white' style={{outline: '1px solid #EEE'}}>
+        {this.props.name ? (
+          // Big header
+          <header className='w-100 ph3 pb3 pt4 tc fw3 f3 black-50 lh-solid'>{this.props.name}</header>
+        ) : this.props.bundle.name ? (
+          // Little header
           <header className='w-100 ph3 pt3'>
             <Link to={'/topic/'+encodeURIComponent(this.props.bundle.name)} className='link ttu fw9 f7 black-30'>{this.props.bundle.name}</Link>
           </header>
-        ) : this.props.name ? (
-          <header className='w-100 ph3 pb3 pt4 tc fw3 f3 black-50 lh-solid'>{this.props.name}</header>
+          // Or nothing
         ) : false}
-				<div className={listClassNames}>
+				<div className='pa1 flex flex-wrap'>
 					{this.props.bundle.articles.map((article,i) => (
-            this.props.column ? (
-              <NewsArticle column key={i} index={i} article={article} />
-            ) : (
-              <div key={i} className='w-100 w-50-ns w-25-l ph1 flex flex-column items-stretch'>
-                <NewsArticle grid key={i} index={i} article={article} />
-              </div>
-            )
+            <NewsArticle key={i} index={i} article={article}
+              column={this.props.column}
+              grid={this.props.grid}
+              bigstory={Boolean(
+                this.props.grid
+                && article.engagementRate > 1
+                && (article.imageURL || article.summary)
+              )}
+              substory={Boolean(
+                this.props.feature
+                && article.engagementRate <= 5
+                && !((article.imageURL || article.summary) && i == 0)
+              )} />
 					))}
 				</div>
 			</section>

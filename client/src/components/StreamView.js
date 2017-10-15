@@ -64,24 +64,33 @@ export default class StreamView extends Component {
 				{this.state.stream ? [
 					this.state.stream.articles.bundles.map(bundle => (
 						(bundle.articles.length > 0 && bundle.name !== '__unbundled') && (
-							<NewsBundle
-								column
-								key={bundle.name+bundle.articles.length}
-								bundle={bundle}
-							 	fetchTopic={this.fetchTopic}
-							/>
+							<div key={bundle.name} className={isFeatured(bundle) ? 'w-100 w-50-ns' : 'w-100 w-50-ns w-25-l'}>
+								<NewsBundle
+									column
+									feature={isFeatured(bundle)}
+									key={bundle.name+bundle.articles.length}
+									bundle={bundle}
+								 	fetchTopic={this.fetchTopic}
+								/>
+							</div>
 						)
 					)),
-					<NewsBundle
-						grid
-						key='unbundled'
-						name={'Also in '+streamLabel}
-						bundle={this.state.stream.articles.bundles.find(b=>b.name === '__unbundled')}
-					/>
+					<div key='__unbundled' className='w-100'>
+						<NewsBundle
+							grid
+							key='unbundled'
+							name={'Also in '+streamLabel}
+							bundle={this.state.stream.articles.bundles.find(b=>b.name === '__unbundled')}
+						/>
+					</div>
 				] : <div className='tc moon-gray w-100 pa3 pa7-l f1 fw9'>Loading articles</div>}
 			</div>
 		]
 	}
+}
+
+function isFeatured(bundle) {
+	return Boolean((bundle.avgEngagementRate > 3 && bundle.articles.length >= 3) || bundle.articles.length >= 7)
 }
 
 function idToName(id,type) {

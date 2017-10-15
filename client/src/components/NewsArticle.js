@@ -7,11 +7,21 @@ export default class NewsArticle extends Component {
 		let { index, article } = this.props
 
 		let date = new Date(article.published)
-		let articleClasses = this.props.column && index > 0 ? 'pv1 bt b--near-white' : 'pv1'
+
+    // CSS
+		let conditionalSeparator = this.props.grid ? ' bt b--near-white ' : ' ';
+		let conditionalWidth =
+      this.props.column
+        ? this.props.substory
+          ? ' substory w-100 w-50-ns ' : ' columnstory w-100 '
+        : this.props.bigstory
+          ? ' bigstory w-100 w-50-ns ' : ' gridstory w-100 w-50-m w-25-l ';
+
+    let articleClasses = 'pa1 '+conditionalWidth+conditionalSeparator;
 
     return (
 			<article className={articleClasses}>
-				<a href={article.url} className='db link dim pointer bg-near-white black-80'>
+				<a href={article.url} className='db h-100 link dim pointer bg-near-white black-80'>
 					{(index === 0 && article.engagementRate > 1 && article.imageURL) && (
 						<div className='cover w-100 h5 cover bg-black-10 mb2' style={{backgroundImage: `url(${article.imageURL})`}} />
 					)}
@@ -36,7 +46,7 @@ export default class NewsArticle extends Component {
 							{article.engagementRate > 1 && article.author && <Middot>{article.author}</Middot>}
 							{article.published && <Middot>{date.toLocaleDateString('en-GB')}</Middot>}
 						</div>
-						{(index === 0 && article.engagementRate > 0.5) && (
+						{((index === 0 && article.engagementRate > 0.5) || this.props.bigstory) && (
 							<p className='baskerville black-80 lh-title' style={{wordWrap: 'break-word'}}>{article.summary}</p>
 						)}
 					</div>

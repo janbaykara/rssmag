@@ -287,11 +287,11 @@ export default function bundleArticles(articles, options = {}) {
 			b.aggEngagementRate = b.articles.reduce((sum,x)=>sum + (x.engagementRate ? parseFloat(x.engagementRate) : 0), 0);
 			b.avgEngagementRate = b.aggEngagementRate / b.articles.length;
 		})
-		stream.bundles = stream.bundles.sort((a,b) => {
-			// if(b.articles.length === a.articles.length) {
-			return b.avgEngagementRate - a.avgEngagementRate;
-			// }
-			// return b.articles.length - a.articles.length;
+		stream.bundles.sort((a,b) => {
+			if(b.articles.length === a.articles.length) {
+				return b.avgEngagementRate - a.avgEngagementRate;
+			}
+			return b.articles.length - a.articles.length;
 		})
 
 		console.log('⚽️ Done!')

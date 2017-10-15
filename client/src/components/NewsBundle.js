@@ -22,11 +22,14 @@ export default class NewsBundle extends Component {
             <NewsArticle key={i} index={i} article={article}
               column={this.props.column}
               grid={this.props.grid}
-              bigstory={Boolean(
+              bigstory={Boolean((
+                this.props.feature
+                && i === 0
+              ) || (
                 this.props.grid
                 && article.engagementRate > 1
                 && (article.imageURL || article.summary)
-              )}
+              ))}
               substory={Boolean(
                 this.props.feature
                 && article.engagementRate <= 5

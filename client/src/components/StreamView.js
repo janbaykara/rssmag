@@ -90,7 +90,15 @@ export default class StreamView extends Component {
 }
 
 function isFeatured(bundle) {
-	return Boolean((bundle.avgEngagementRate > 3 && bundle.articles.length >= 3) || bundle.articles.length >= 7)
+	return Boolean((
+		// Fancy looking important articles
+			bundle.articles[0].imageURL
+			&& bundle.articles[0].summary
+			&& bundle.articles[0].engagementRate > 1
+			&& bundle.avgEngagementRate > 0.5
+			&& bundle.articles.length >= 3
+		) // Or just loads.
+		|| bundle.articles.length >= 7)
 }
 
 function idToName(id,type) {

@@ -41,7 +41,7 @@ export default function bundleArticles(articles, options = {}) {
 			BUNDLE_SIZE_MIN: 2,
 			BUNDLE_SIZE_MAX: 7,
 			//
-			EXCLUSIVE_BUNDLES_BOOL: true,
+			EXCLUSIVE_BUNDLES: true,
 			CATEGORY_CORPUS: true,
 			//
 			SNIPPET_MIN_LENGTH: 100,
@@ -112,11 +112,11 @@ export default function bundleArticles(articles, options = {}) {
 					opts.TAG_MIN_FREQUENCY_ARTICLE,
 					opts.TAG_MAX_WORDS_ARTICLE);
 
-			// Remove short words
-			article.tagData = article.tagData.filter(t => t.word.length >= opts.TAG_MIN_CHAR_LENGTH);
-
 			// Flatten to word array
 			article.tags = article.tagData.map(tag => tag.word);
+
+			// Delete short strings
+			article.tags = article.tags.filter(t => t.length >= opts.TAG_MIN_CHAR_LENGTH);
 
 			// Include keywords
 			article.tags = article.tags.concat(article.keywords);
@@ -127,8 +127,8 @@ export default function bundleArticles(articles, options = {}) {
 			article.tags = article.tags.filter(String);
 			article.tags = article.tags.filter(Boolean);
 
-			// Delete short strings
-			article.tags = article.tags.filter(t => t.length >= opts.TAG_MIN_CHAR_LENGTH);
+			// Normalise to lowercase
+			article.tags = article.tags.map(t => t.toLowerCase());
 
 			// Dedupe tags
 			article.tags = [...new Set(article.tags)];
@@ -154,21 +154,37 @@ export default function bundleArticles(articles, options = {}) {
 
 			// Simplify
 			corpusTags = corpusTags.map(t => t.word);
+
+			// Delete short strings
+			corpusTags = corpusTags.filter(t => t.length >= opts.TAG_MIN_CHAR_LENGTH);
+
+			// Remove empty elements
+			corpusTags = corpusTags.filter(String);
+			corpusTags = corpusTags.filter(Boolean);
+
+			// Normalise to lowercase
+			corpusTags = corpusTags.map(t => t.toLowerCase());
+
 			categoryTags = categoryTags.concat(corpusTags)
 		}
 
+		// Dedupe once again
+		let tagsBefore = categoryTags.length;
 		categoryTags = [...new Set(categoryTags)];
+		console.log(`Removed ${tagsBefore - categoryTags.length} duplicate tags.`);
 
-		console.log("⚽️ Ordering tags by novelty")
+		if(opts.EXCLUSIVE_BUNDLES) {
+			console.log("⚽️ Ordering tags by novelty")
 
-		// Order least common
-		categoryTags = categoryTags.sort((a,b)=> {
-			let aC = corpus.find(C => C.word == a);
-			let aCCount = aC ? aC.count : 0;
-			let bC = corpus.find(C => C.word == b);
-			let bCCount = bC ? bC.count : 0;
-			return aC - bC;
-		})
+			// Order least common
+			categoryTags = categoryTags.sort((a,b)=> {
+				let aC = corpus.find(C => C.word == a);
+				let aCCount = aC ? aC.count : 0;
+				let bC = corpus.find(C => C.word == b);
+				let bCCount = bC ? bC.count : 0;
+				return aC - bC;
+			})
+		}
 
 		/**
 		 * BUNDLE ARTICLES
@@ -196,8 +212,8 @@ export default function bundleArticles(articles, options = {}) {
 					if(
 						tagArr.some(t => article.tags.includes(t))
 						&& (
-							(opts.EXCLUSIVE_BUNDLES_BOOL && !article.assignedBundle)
-							|| (!opts.EXCLUSIVE_BUNDLES_BOOL)
+							(opts.EXCLUSIVE_BUNDLES && !article.assignedBundle)
+							|| (opts.EXCLUSIVE_BUNDLES === false)
 						)
 					) {
 						// if(tryN === 1) {
@@ -249,7 +265,7 @@ export default function bundleArticles(articles, options = {}) {
 
 		console.log(`\n
 			🍾🎉🤓 Bundling complete.\n
-			${Object.keys(stream.bundles).length} bundles containing ${articles.length - stream.bundles.__unbundled.length}/${articles.length} articles.
+			${Object.keys(stream.bundles).length-1} bundles containing ${articles.length - stream.bundles.__unbundled.length}/${articles.length} articles.
 			\n`);
 
 		/**

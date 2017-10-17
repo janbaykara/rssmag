@@ -43,6 +43,7 @@ export default function bundleArticles(articles, options = {}) {
 			//
 			EXCLUSIVE_BUNDLES: true,
 			CATEGORY_CORPUS: true,
+			NOVELTY_SORTING: true,
 			//
 			SNIPPET_MIN_LENGTH: 100,
 			SNIPPET_MAX_LENGTH: 350,
@@ -173,7 +174,7 @@ export default function bundleArticles(articles, options = {}) {
 		categoryTags = [...new Set(categoryTags)];
 		console.log(`Removed ${tagsBefore - categoryTags.length} duplicate tags.`);
 
-		if(opts.EXCLUSIVE_BUNDLES) {
+		if(opts.EXCLUSIVE_BUNDLES && opts.NOVELTY_SORTING) {
 			console.log("⚽️ Ordering tags by novelty")
 
 			// Order least common

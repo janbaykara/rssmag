@@ -19,7 +19,7 @@ export default function NewsBundle(props) {
         <header className='w-100 ph3 pb3 pt4 tc fw3 f3 black-50 lh-solid'>{props.name}</header>
       ) : props.bundle.name ? (
         // Little header
-        <header className='w-100 ph3 pt3'>
+        <header className='w-100 ph3 pt2'>
           <Link to={'/topic/'+encodeURIComponent(props.bundle.name)} className='link ttu fw9 f7 black-30'>{props.bundle.name}</Link>
         </header>
         // Or nothing

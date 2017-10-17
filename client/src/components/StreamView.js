@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import 'tachyons';
 import NewsBundle from './NewsBundle';
-import NewsArticle from './NewsArticle';
 import diff from 'deep-diff';
 
 export default class StreamView extends Component {
@@ -11,14 +10,14 @@ export default class StreamView extends Component {
 	}
 
 	componentDidMount() {
-		this.fetchStream(this.props.type, this.props.streamId)
+		this.fetchStream(this.props.streamType, this.props.streamId)
 	}
 
 	// On router new category
 	componentWillReceiveProps = (nextProps) => {
 		if(this.props.streamId !== nextProps.streamId) {
 			// console.log(`🌼🌼 ${idToName(decodeURIComponent(this.props.streamId))} => ${idToName(decodeURIComponent(nextProps.streamId))}`)
-			this.fetchStream(nextProps.type, nextProps.streamId)
+			this.fetchStream(nextProps.streamType, nextProps.streamId)
 		}
 	}
 
@@ -41,7 +40,7 @@ export default class StreamView extends Component {
 
 		switch(type) {
 			case 'category': url = `/api/bundle/200/streamed/articles/${encodeURIComponent(id)}`; break;
-			case 'topic': url = `/api/bundle/100/mixed/articles/${encodeURIComponent(`topic/${id}`)}`; break;
+			case 'topic': url = `/api/bundle/200/mixed/articles/${encodeURIComponent(`topic/${id}`)}`; break;
 			default: return false;
 		}
 
@@ -55,11 +54,7 @@ export default class StreamView extends Component {
   }
 
 	render = () => {
-		const streamId = decodeURIComponent(this.props.streamId)
-		const streamLabel = this.props.type === 'category' && this.props.categories && this.props.categories.length > 0 ? this.props.categories.find(c => c.id === streamId).label : idToName(streamId, this.props.type) // Extract name from id string
-
-		return [
-			<header key='header' className='f1 fw3 mv4 tc ttc'>{streamLabel}</header>,
+		return (
 			<div key='body' className='flex flex-wrap items-start items-stretch pa3 pt0'>
 				{this.state.stream ? [
 					this.state.stream.articles.bundles.map(bundle => (
@@ -79,13 +74,13 @@ export default class StreamView extends Component {
 						<NewsBundle
 							grid
 							key='unbundled'
-							name={'Also in '+streamLabel}
+							name={'Also in '+this.props.streamLabel}
 							bundle={this.state.stream.articles.bundles.find(b=>b.name === '__unbundled')}
 						/>
 					</div>
 				] : <div className='tc moon-gray w-100 pa3 pa7-l f1 fw9'>Loading articles</div>}
 			</div>
-		]
+		)
 	}
 }
 
@@ -99,16 +94,4 @@ function isFeatured(bundle) {
 			&& bundle.articles.length >= 3
 		) // Or just loads.
 		|| bundle.articles.length >= 7)
-}
-
-function idToName(id,type) {
-	switch(type) {
-		case 'category':
-			var matches = /category\/(.*)$/ig.exec(id);
-			return matches ? matches[1] : null;
-		case 'topic':
-			return `Topic: ${id}`;
-		default:
-			return '';
-	}
 }

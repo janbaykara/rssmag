@@ -8,15 +8,7 @@ import {
 import styled from 'styled-components';
 import 'tachyons';
 import CategoriesNav from './components/CategoriesNav';
-import StreamView from './components/StreamView';
-
-const Logo = styled.header`
-  user-select: none;
-  transition: opacity 0.2s ease;
-  opacity: 1;
-  .sidebarOpen & { opacity: 0.2 }
-  .sidebarOpen & .thenHide { opacity: 0 }
-`
+import ReaderRoute from './components/ReaderRoute';
 
 const SlideRevealWindow = styled.div.attrs({
   className: 'absolute bg-white flex-l'
@@ -36,7 +28,8 @@ const SlideRevealWindow = styled.div.attrs({
 
     * { pointer-events: none; }
   }
-`
+`;
+SlideRevealWindow.displayName = 'SlideRevealWindow';
 
 export default class App extends Component {
   constructor({match}) {
@@ -74,20 +67,17 @@ export default class App extends Component {
           />
           <Switch>
             <Route path='/:type/:streamId' render={(props) => (
-              <SlideRevealWindow onClick={this.state.isSidebarOpen ? this.toggleSidebar : null}>
-                <div className='w-100 w-10-l center ma0-l tl-l'>
-                  <Logo onClick={this.toggleSidebar} className='relative fixed-l pa3 pointer bg-white'>
-                    <span className='fw9 f3'>{this.state.isSidebarOpen ? '✖︎' : '☰'}&nbsp;</span>
-                    <span className='fw9 f3 thenHide'>RSSMAG</span>
-                  </Logo>
-                </div>
-                <main className='w-100 w-80-l center ma0-l'>
-                  <StreamView
-                    categories={this.state.categories}
-                    type={props.match.params.type}
-                    streamId={decodeURIComponent(props.match.params.streamId)}
-                  />
-                </main>
+              <SlideRevealWindow
+                onClick={this.state.isSidebarOpen ? this.toggleSidebar : null}
+                ref={(el) => { this.mainScrollView = el}}>
+                <ReaderRoute
+                  scrollRef={this.mainScrollView}
+                  toggleSidebar={this.toggleSidebar}
+                  isSidebarOpen={this.state.isSidebarOpen}
+                  categories={this.state.categories}
+                  streamType={props.match.params.type}
+                  streamId={decodeURIComponent(props.match.params.streamId)}
+                />
               </SlideRevealWindow>
             )} />
             <Redirect to={'/category/'+defaultCategoryId} />

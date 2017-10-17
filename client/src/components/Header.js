@@ -35,10 +35,7 @@ export default class Header extends Component {
 	}
 
 	handleScroll = (e) => {
-		let el = this.mainScrollView;
-		let scrollTop = el.scrollTop;
-		console.log(scrollTop);
-		this.setState({scrolledDown: scrollTop > 20})
+		this.setState({scrolledDown: this.mainScrollView.scrollTop > 20})
 	}
 
 	render() {

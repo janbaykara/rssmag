@@ -14,10 +14,9 @@ export default class ReaderRoute extends Component {
 		const props = this.props;
 
     // Stream name (category/topic)
-		const streamId = decodeURIComponent(props.streamId);
 		const streamLabel = props.streamType === 'category' && props.categories && props.categories.length > 0
-			? props.categories.find(c => c.id === streamId).label
-			: idToName(streamId, props.streamType); // Extract name from id string
+			? props.categories.find(c => c.id === props.streamId).label
+			: idToName(props.streamId, props.streamType); // Extract name from id string
 
     // CSS
 		const titleContainerClasses = ' pt5 pb4 '
@@ -35,7 +34,7 @@ export default class ReaderRoute extends Component {
 					<div className={'o-0 tc w-100 mb3'+titleBigClasses+titleContainerClasses}>{streamLabel}</div>
 					<StreamView
 						streamType={props.streamType}
-						streamId={decodeURIComponent(props.streamId)}
+						streamId={props.streamId}
 						streamLabel={streamLabel}
 					/>
 				</main>

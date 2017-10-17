@@ -36,6 +36,8 @@ export default class StreamView extends Component {
 	}
 
 	fetchStream = (type, id) => {
+		this.setState({stream: null})
+
 		let url;
 
 		switch(type) {

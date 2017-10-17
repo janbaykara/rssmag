@@ -1,7 +1,17 @@
 # RSSMAG
 A natural, magazine-like reading experience for Feedly, in the spirit of print/digital media's bold history. Think [Flipboard](flipboard.com) for RSS power-users.
 
-In the spirit of [Google News](news.google.com), automated editorial will visually construct an information hierarchy, grouping articles in a way that feels intuitive, and improves reading. Hopefully we can meet [these criteria](https://news.ycombinator.com/item?id=12933006).
+As in [Google News](news.google.com), automated editorial will visually construct an information hierarchy, grouping articles in a way that feels intuitive, and improves reading. Hopefully we can meet [these criteria](https://news.ycombinator.com/item?id=12933006).
+
+## Screenshots
+
+![Imgur](https://i.imgur.com/7RjjRhv.jpg)
+
+![Imgur](https://i.imgur.com/pIy8sta.png)
+
+![Imgur](https://i.imgur.com/NNo0Stm.jpg)
+
+## Tasks
 
 ### To-do: Bundling
 * [X] Integrates with [Feedly](feedly.com)

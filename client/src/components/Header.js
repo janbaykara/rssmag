@@ -12,6 +12,18 @@ const Logo = styled.div`
   .sidebarOpen & .thenHide { opacity: 0 }
 `
 
+const FloatingHeader = styled.header`
+	${({scrolledDown}) => (scrolledDown
+		? // Initial state: delay appearance of box-shadow
+		` transition: all 0.75s ease, box-shadow 1s ease 0.25s;
+			box-shadow: 0 0 8px 2px rgba( 0, 0, 0, .2 );
+		`:// Transitioned state: rapid box-shadow disappearance
+		` transition: all 0.3s ease;
+			box-shadow: 0 0 0 0 rgba( 0, 0, 0, 0 );
+		`
+	)};
+`
+
 export default class Header extends Component {
 	constructor(props) {
 		super(props)
@@ -38,14 +50,9 @@ export default class Header extends Component {
 		const conditionalTitleClasses = this.state.scrolledDown ? headerSmallClasses : titleBigClasses;
 
 		return (
-			<header
-				className={'z-5 pa3 w-100 center flex flex-row fixed w-100 items-center bg-white '+scrollConditionalClasses}
-				style={{
-					transition: 'all 0.2s ease, box-shadow 0.3s ease 0.25s',
-					boxShadow: this.state.scrolledDown
-						? '0 0 8px 2px rgba( 0, 0, 0, .2 )'
-						: '0 0 0 0 rgba( 0, 0, 0, 0 )'
-				}}>
+			<FloatingHeader
+				scrolledDown={this.state.scrolledDown}
+				className={'z-5 pa3 w-100 center flex flex-row fixed w-100 items-center bg-white '+scrollConditionalClasses}>
         {this.mainScrollView && <EventListener
           target={this.mainScrollView}
           onScroll={this.handleScroll}
@@ -56,7 +63,7 @@ export default class Header extends Component {
 				</Logo>
 				<div className={'z-5 tc w-100 '+conditionalTitleClasses}
 					style={{pointerEvents: 'none'}}>{this.props.streamLabel}</div>
-			</header>
+			</FloatingHeader>
 		)
 	}
 }

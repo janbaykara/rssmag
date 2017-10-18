@@ -1,9 +1,19 @@
 # RSSMAG
 A natural, magazine-like reading experience for Feedly, in the spirit of print/digital media's bold history. Think [Flipboard](flipboard.com) for RSS power-users.
 
-In the spirit of [Google News](news.google.com), automated editorial will visually construct an information hierarchy, grouping articles in a way that feels intuitive, and improves reading. Hopefully we can meet [these criteria](https://news.ycombinator.com/item?id=12933006).
+As in [Google News](news.google.com), automated editorial will visually construct an information hierarchy, grouping articles in a way that feels intuitive, and improves reading. Hopefully we can meet [these criteria](https://news.ycombinator.com/item?id=12933006).
 
-##### Todo: Bundling
+## Screenshots
+
+![Imgur](https://i.imgur.com/7RjjRhv.jpg)
+
+![Imgur](https://i.imgur.com/pIy8sta.png)
+
+![Imgur](https://i.imgur.com/NNo0Stm.jpg)
+
+## Tasks
+
+### To-do: Bundling
 * [X] Integrates with [Feedly](feedly.com)
 * [X] Focus on unusual words (e.g. by low->high corpus frequency)
 * [X] Identify similar tags (thesaurus, different forms of same word)
@@ -12,16 +22,18 @@ In the spirit of [Google News](news.google.com), automated editorial will visual
 * [X] Article snippets cut to 5 sentences
 * [X] Order bundles by size
 * [X] Dedupe article list (by title, url), favour higher engagement and shorter source name
+* [ ] Allow large bundles if they are specific enough
+* [ ] Multi-level bundling?
 * [ ] Identify specific topics / entities of articles
-** https://nlp.stanford.edu/software/CRF-NER.shtml
-** https://github.com/NaturalNode/natural#classifiers
+  * https://nlp.stanford.edu/software/CRF-NER.shtml
+  * https://github.com/NaturalNode/natural#classifiers
 * [ ] Group tags by overlap, develop venn diagram of (near) exclusive article groups => bundle
-** Potentially something like neo4j, or some other on-the-go graphing (tags as nodes)
+  * Potentially something like neo4j, or some other on-the-go graphing (tags as nodes)
 * [ ] ML takeover
-** [ ] UI to drag-drop create/edit bundles
-** [ ] ML network that learns bundling techniques, given { title, date, summary }
+  * [ ] UI to drag-drop create/edit bundles
+  * [ ] ML network that learns bundling techniques, given { title, date, summary }
 
-###### Classification reading
+#### Classification reading
 * https://en.wikipedia.org/wiki/Multi-label_classification
 * https://www.researchgate.net/publication/276914825_Fuzzy_rule_classifiers_for_multi-label_classification
 * https://stackoverflow.com/questions/14574462/news-article-categorization-subject-entity-analysis-via-nlp-preferably-in
@@ -30,39 +42,39 @@ In the spirit of [Google News](news.google.com), automated editorial will visual
 * [node-svm](http://svmlight.joachims.org/)
 * `naivebayesclassifier`
 
-##### Todo: Presentation
+### To-do: Presentation
 * [X] Highlights notable stories - uses Feedly 'engagementRate'
 * [X] Category-wide visual hierarchy
 * [X] Display unbundled articles better
 * [X] Random colour-coding for bundles
-* [ ] Nav banner with current Stream name
+* [X] Nav banner with current Stream name
 * [ ] Animated server algo loading indicator
 * [ ] Typographic experiments
-** [ ] OS typeface option (white?)
-** [ ] Paper type option (faded paper?)
+  * [ ] OS typeface option (white?)
+  * [ ] Paper type option (faded paper?)
 * [X] Guardian-style horizontal/vertical blocks
-** [X] Longest / most engaged bundles get multiple column
+  * [X] Longest / most engaged bundles get multiple column
 * [ ] Varied magazine-like layouts for long-scroll streams
 * [ ] In-page article viewing
 
-##### Todo: Technical
+### To-do: Technical
 * [X] React Router for category IDs
 * [ ] Move from inter-component CSS styling to ${props=>props} styled-components definitions
 * [ ] Sockets.io post loading updates from algorithm
-** [ ] Switch to genuine Progress-enabled promises - https://www.npmjs.com/package/deferred
+  * [ ] Switch to genuine Progress-enabled promises - https://www.npmjs.com/package/deferred
 * [ ] Switch to Redux centralised state
 * [ ] React component performance profiling
-** https://engineering.musefind.com/how-to-benchmark-react-components-the-quick-and-dirty-guide-f595baf1014c
-** https://benchling.engineering/performance-engineering-with-react-e03013e53285
-** https://benchling.engineering/a-deep-dive-into-react-perf-debugging-fd2063f5a667
+  * https://engineering.musefind.com/how-to-benchmark-react-components-the-quick-and-dirty-guide-f595baf1014c
+  * https://benchling.engineering/performance-engineering-with-react-e03013e53285
+  * https://benchling.engineering/a-deep-dive-into-react-perf-debugging-fd2063f5a667
 * [ ] Multithreading, nonblocking, performance tweaking for multi instances of Node
-** http://www.acuriousanimal.com/2017/08/12/understanding-the-nodejs-cluster-module.html
-*** https://nodejs.org/api/cluster.html#cluster_cluster
-** https://www.npmjs.com/package/memored
+  * http://www.acuriousanimal.com/2017/08/12/understanding-the-nodejs-cluster-module.html
+    * https://nodejs.org/api/cluster.html#cluster_cluster
+  * https://www.npmjs.com/package/memored
 * [ ] Tests
 * [ ] Handoff to non-node process? Python ML etc.
 
-##### Todo: Live deployment
+### To-do: Live deployment
 * [ ] Local storage for config
 * [ ] Feedly app production keys
 * [ ] Multiple Feedly users
